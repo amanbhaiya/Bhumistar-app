@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Bhumistar</string>
+    <string name="title_activity_splash">Splash</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_activity_on_boarding">OnBoardingActivity</string>
+    <string name="title_activity_authentication">Authentication</string>
+</resources>

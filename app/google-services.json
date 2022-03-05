@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "377866628586",
+    "project_id": "bhumistar-591c7",
+    "storage_bucket": "bhumistar-591c7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377866628586:android:3371c54c319890038cd693",
+        "android_client_info": {
+          "package_name": "com.digitalamanmedia.bhumistar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377866628586-rn00hncedrjjbc5uqc9hjc81qhatfcqj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.digitalamanmedia.bhumistar",
+            "certificate_hash": "8a75f8639b90e964e537ca9f2c0236b1bb83e74b"
+          }
+        },
+        {
+          "client_id": "377866628586-eh9i86p51v15cbr8o3b5lkoh12bcnnn1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1T3DTHuHY6mHT4BKvqxWY2gqP48bxRGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377866628586-eh9i86p51v15cbr8o3b5lkoh12bcnnn1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
