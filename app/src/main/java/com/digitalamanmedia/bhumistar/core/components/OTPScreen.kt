@@ -31,7 +31,8 @@ fun OTPScreen(
     code: String,
     onValueChange:(String)->Unit,
     focusRequester: FocusRequester,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onVerifyClick:()->Unit = {}
 ) {
 
     LaunchedEffect(Unit) {
@@ -52,13 +53,13 @@ fun OTPScreen(
                 .focusRequester(focusRequester = focusRequester),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
             decorationBox = {
-                CodeInputDecoration(code, codeLength,modifier)
+                CodeInputDecoration(code, codeLength,modifier,onVerifyClick)
             })
     }
 }
 
 @Composable
-private fun CodeInputDecoration(code: String, length: Int,modifier: Modifier) {
+private fun CodeInputDecoration(code: String, length: Int,modifier: Modifier,onVerifyClick:()->Unit) {
     Box(
         modifier = Modifier
             .border(
@@ -78,7 +79,7 @@ private fun CodeInputDecoration(code: String, length: Int,modifier: Modifier) {
 
         }
         TextButton(
-            onClick = { /*TODO*/ },
+            onClick = onVerifyClick,
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
             Text(

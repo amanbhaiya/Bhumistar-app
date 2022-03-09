@@ -1,31 +1,17 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.foundation.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.digitalamanmedia.bhumistar.R
-import com.digitalamanmedia.bhumistar.persentation.authentication.Authentication
-import com.digitalamanmedia.bhumistar.persentation.authentication.components.OTPScreen
-import com.digitalamanmedia.bhumistar.persentation.authentication.components.TransparentTextField
+import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens.ForgotPasswordScreen
+import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens.LoginScreen
+import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens.UserRegisterScreen
 import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_viewmodel.UserAuthViewModel
 import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_viewmodel.UserUiEvent
 
@@ -35,135 +21,153 @@ fun UserAuth(
     onSubmitClick:()->Unit,
     viewModel:UserAuthViewModel = hiltViewModel()
 ) {
+    val state = viewModel.state.value
 
-
-    var number by remember {
-        mutableStateOf("")
+    var isLogin by remember {
+        mutableStateOf(true)
     }
-    var otp by remember {
-        mutableStateOf("")
+    var isPassword by remember {
+        mutableStateOf(false)
     }
     val focusRequester = FocusRequester()
-    var email by remember {
+
+    //forgot
+
+    var forgotNumber by remember {
         mutableStateOf("")
     }
-    var name by remember {
+    var forgotPassword by remember {
         mutableStateOf("")
+    }
+    var forgotOtp by remember {
+        mutableStateOf("")
+    }
+
+    //login
+    var loginEmail by remember {
+        mutableStateOf("")
+    }
+    var loginPassword by remember {
+        mutableStateOf("")
+    }
+
+
+    var passwordVisibility by remember {
+        mutableStateOf(false)
     }
     val darkTheme = isSystemInDarkTheme()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.surface),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-
-    ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.8f)
-            .padding(start = 16.dp, end = 16.dp)
-
-        ) {
-            if (darkTheme){
-                Image(
-                    modifier = Modifier
-                        .size(100.dp),
-                    painter = painterResource(
-                        id = R.drawable.night_logo),
-                    contentDescription = "logo"
-                )
-            }else{
-                Image(
-                    modifier = Modifier
-                        .size(100.dp),
-                    painter = painterResource(
-                        id = R.drawable.bhumistar),
-                    contentDescription = "logo"
-                )
-            }
-            Text(
-                text = "Welcome to Bhumistar",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.primaryVariant
-            )
-            Spacer(modifier = Modifier.padding(4.dp))
-            Text(
-                text = "User Registration",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colors.primaryVariant
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-            TransparentTextField(
-                text = viewModel.state.value.phone_number,
-                hint = "Enter your number...",
-                leadingText = "+91",
-                onValueChanged = {
-                    viewModel.onUiEvent(UserUiEvent.EnterPhoneNumber(it))
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.Number,
-                verify = "Get OTP",
-                onClickVerify = {
-                    viewModel.onUiEvent(UserUiEvent.GetOTP("+91"+viewModel.state.value.phone_number))
-                }
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-
-            OTPScreen(
-                code = viewModel.state.value.number_OTP,
-                codeLength = 6,
-                focusRequester = focusRequester,
-                onValueChange = {
-                    viewModel.onUiEvent(UserUiEvent.EnterOTP(it))
-                },
-                modifier = Modifier
-                    .width(45.dp)
-                    .height(55.dp),
-            )
-
-            Spacer(modifier = Modifier.padding(4.dp))
-            TransparentTextField(
-                text = name,
-                hint = "Enter your name...",
-                painter = Icons.Default.Person,
-                onValueChanged = {
-                    name = it
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.Text,
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-            TransparentTextField(
-                text = email,
-                hint = "Enter your email...",
-                painter = Icons.Default.Email,
-                onValueChanged = {
-                    email= it
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.Email,
-            )
-        }
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(0.4f),
-            onClick = onSubmitClick,
-            border = BorderStroke(1.dp, MaterialTheme.colors.error),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent
-            )
-        ) {
-            Text(
-                text = "Register",
-                color = MaterialTheme.colors.error,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(vertical = 3.dp)
-            )
-        }
+    val icon = if (passwordVisibility){
+        Icons.Default.VisibilityOff
+    }else{
+        Icons.Default.Visibility
     }
+    val visibility =  if (passwordVisibility){
+        VisualTransformation.None
+    }else{
+        PasswordVisualTransformation()
+    }
+    if (isLogin && !isPassword){
+        LoginScreen(
+            darkTheme = darkTheme,
+            email = loginEmail,
+            password = loginPassword,
+            onEmailChanged = {
+                loginEmail = it
+            },
+            onPasswordChanged = {
+                loginPassword = it
+            },
+            onSubmitClick = {
+
+            },
+            onLoginPasswordVisibilityClick = {
+                passwordVisibility = !passwordVisibility
+            },
+            onForgotTextClick =
+            {
+                isPassword = true
+                isLogin = false
+            },
+            onRegisterTextClick =
+            {
+                isLogin = false
+            },
+            icon = icon,
+            visibility = visibility
+        )
+    }
+    if (isPassword){
+        ForgotPasswordScreen(
+            darkTheme = darkTheme,
+            number = forgotNumber,
+            password = forgotPassword,
+            otp = forgotOtp,
+            focusRequester = focusRequester,
+            onNumberChanged = {
+                forgotNumber = it
+            },
+            onPasswordChanged = {
+                forgotPassword = it
+            },
+            onSubmitClick = { /*TODO*/ },
+            onVerifyClick = { /*TODO*/ },
+            onForgotPasswordVisibilityClick = {
+                passwordVisibility = !passwordVisibility
+            },
+            onLoginTextClick = {
+                isPassword = false
+            },
+            onOTPNumberChanged = {
+                forgotOtp = it
+            },
+            icon = icon,
+            visibility = visibility
+        )
+    }
+    if (!isLogin && !isPassword){
+        UserRegisterScreen(
+            darkTheme = darkTheme,
+            number = viewModel.number.value,
+            password = viewModel.password.value,
+            otp = viewModel.userOtp.value ,
+            name = viewModel.name.value,
+            email = viewModel.email.value,
+            focusRequester = focusRequester,
+            onNumberChanged = {
+                viewModel.onUiEvent(UserUiEvent.EnterNumber(it))
+            },
+            onNameChanged = {
+                viewModel.onUiEvent(UserUiEvent.EnterName(it))
+            },
+            onEmailChanged = {
+                viewModel.onUiEvent(UserUiEvent.EnterEmail(it))
+            },
+            onPasswordChanged = {
+                viewModel.onUiEvent(UserUiEvent.EnterPassword(it))
+            },
+            onSubmitClick = {
+                viewModel.onUiEvent(UserUiEvent.RegisterUser)
+            },
+            onLoginPasswordVisibilityClick = {
+                passwordVisibility = !passwordVisibility
+            },
+            onLoginTextClick = {
+                isLogin = true
+            },
+            onVerifyClick = {
+                viewModel.onUiEvent(UserUiEvent.VerifyOTP)
+            },
+            onVerifyClickGetOTP = {
+                viewModel.onUiEvent(UserUiEvent.GetOTP)
+            },
+            onOTPNumberChanged = {
+                viewModel.onUiEvent(UserUiEvent.EnterPassword(it))
+            },
+            icon = icon,
+            visibility = visibility
+        )
+    }
+
+
+
 }
