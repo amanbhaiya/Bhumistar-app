@@ -16,14 +16,14 @@ import com.digitalamanmedia.bhumistar.ui.theme.BadgeColor
 
 @Composable
 fun ActionBar(
-    openDrawer:()-> Unit
+    registerVendor:()->Unit
 ) {
      TopAppBar(
          modifier = Modifier
              .clip(
                  shape = RoundedCornerShape(
-                     bottomStart = 15.dp,
-                     bottomEnd = 15.dp
+                     bottomStart = 5.dp,
+                     bottomEnd = 5.dp
                  )
              ),
          backgroundColor = MaterialTheme.colors.primary,
@@ -33,18 +33,6 @@ fun ActionBar(
                  color = Color.White,
                  fontSize = 22.sp
              )
-         },
-         navigationIcon = {
-                          IconButton(
-                              onClick = openDrawer
-                          ) {
-                              Icon(
-                                  imageVector = Icons.Default.Menu,
-                                  contentDescription = "Menu",
-                                  tint = Color.White
-                              )
-
-                          }
          },
          actions = {
 
@@ -63,7 +51,7 @@ fun ActionBar(
                      modifier = Modifier
                          .padding(top = 2.dp, end = 5.dp)
                          .clickable {
-
+                             registerVendor()
                          },
                      text = "List Property",
                      color = Color.White,

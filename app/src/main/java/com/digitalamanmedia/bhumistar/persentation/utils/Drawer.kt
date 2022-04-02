@@ -2,20 +2,16 @@ package com.digitalamanmedia.bhumistar.persentation.utils
 
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
 import com.digitalamanmedia.bhumistar.R
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.runtime.*
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 
@@ -25,9 +21,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digitalamanmedia.bhumistar.core.Commons
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.component.Dropdown
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.utils.StateAndDistrict
 
 @Composable
-fun NavigationDrawer() {
+fun NavigationDrawer(
+    goToAuthentication:()->Unit,
+    onItemClick:(String)->Unit
+) {
+    val scrollState = rememberScrollState()
+    var isAuthVisible by remember {
+        mutableStateOf(false)
+    }
+    var isCitiesVisible by remember {
+        mutableStateOf(false)
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,15 +74,95 @@ fun NavigationDrawer() {
     DrawerItems(
         img = R.drawable.sign,
         text = "Sign In",
-        onDropDownClick = {},
+        onDropDownClick = {
+                          isAuthVisible = !isAuthVisible
+        },
         isNeeded = true
     )
+    AnimatedVisibility(
+        visible = isAuthVisible,
+        enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceBetween
+        )  {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 70.dp,
+                        vertical = 4.dp
+                    )
+                    .clickable {
+                        goToAuthentication()
+                    },
+                text = "Register as Vendor",
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 14.sp
+            )
+            Divider(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(1.dp)
+                    .padding(
+                        start = 70.dp
+                    )
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 70.dp,
+                        vertical = 4.dp
+                    )
+                    .clickable {
+                        goToAuthentication()
+                    },
+                text = "Register as User",
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = 14.sp
+            )
+            Divider(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(1.dp)
+                    .padding(
+                        start = 70.dp
+                    )
+            )
+        }
+    }
     DrawerItems(
         img = R.drawable.icities,
         text = "Cities",
-        onDropDownClick = {},
+        onDropDownClick = {
+            isCitiesVisible = !isCitiesVisible
+        },
         isNeeded = true
     )
+    AnimatedVisibility(
+        visible = isCitiesVisible,
+        enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically()
+    ) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 55.dp
+            )
+        ){
+            Dropdown(
+                list = StateAndDistrict.getState(),
+                onClickItems = onItemClick,
+                scrollState = scrollState,
+                fontSize = 14.sp
+            )
+        }
+
+    }
     DrawerItems(
         img = R.drawable.owner,
         text = "Owner Packages",
@@ -92,13 +181,6 @@ fun NavigationDrawer() {
         onDropDownClick = {},
         isNeeded = false
     )
-    DrawerItems(
-        img = R.drawable.about,
-        text = "About Us",
-        onDropDownClick = {},
-        isNeeded = true
-    )
-
 }
 
 @Composable
@@ -112,6 +194,10 @@ fun DrawerItems(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .clickable {
+                onDropDownClick()
+            }
+            .background(MaterialTheme.colors.secondary)
         ,
     ){
         Row(
@@ -135,7 +221,7 @@ fun DrawerItems(
             Text(
                 text = text,
                 color = MaterialTheme.colors.primaryVariant,
-                fontSize = 16.sp
+                fontSize = 15.sp
             )
 
 
@@ -143,7 +229,7 @@ fun DrawerItems(
         }
       if (isNeeded){
           IconButton(
-              onClick = { onDropDownClick },
+              onClick = { onDropDownClick() },
               modifier = Modifier.align(CenterEnd)
           ) {
               Icon(

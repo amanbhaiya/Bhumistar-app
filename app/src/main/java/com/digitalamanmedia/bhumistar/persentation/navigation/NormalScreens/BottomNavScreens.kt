@@ -10,26 +10,23 @@ sealed class BottomNavScreens(val route:String, val title:String, @DrawableRes v
         title= "Home",
         icons= R.drawable.home
     )
-    object Verified: BottomNavScreens(
-        route="verified_route",
-        title= "Verified",
-        icons= R.drawable.verified
-    )
     object Search: BottomNavScreens(
         route="search_route",
         title= "Search",
         icons= R.drawable.search
     )
-    object Favorites: BottomNavScreens(
-        route="favorites_route",
-        title= "Favorites",
-        icons= R.drawable.favorite
-    )
+
     object Profile: BottomNavScreens(
         route="profile_route",
         title= "Profile",
         icons= R.drawable.profile
     )
+    object Contacts: BottomNavScreens(
+        route="contacts_route",
+        title= "Contacts",
+        icons= R.drawable.phone
+    )
+
 
 }
 

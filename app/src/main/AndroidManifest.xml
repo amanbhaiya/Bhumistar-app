@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.digitalamanmedia.bhumistar">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".BhumistarApp"
@@ -11,20 +14,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Bhumistar">
+        android:theme="@style/Theme.Bhumistar"
+        android:usesCleartextTraffic="true">
         <activity
-            android:name=".persentation.authentication.Authentication"
+            android:name=".persentation.property_uplaod.PropertyUploadActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
+            android:theme="@style/Theme.Bhumistar.NoActionBar" />
+        <activity
+            android:name=".persentation.authentication.AuthenticationActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Bhumistar.NoActionBar"/>
         <activity
             android:name=".persentation.onBoarding.onboarding_screen.OnBoardingActivity"
             android:exported="false"
@@ -36,16 +39,32 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar"/>
+            android:theme="@style/Theme.Bhumistar.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".persentation.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar" >
-
-        </activity>
+            android:theme="@style/Theme.Bhumistar.NoActionBar"/>
+        <service
+            android:name=".core.utils.NotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notification" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/bhumistar" />
     </application>
 
 </manifest>

@@ -1,14 +1,10 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -18,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,9 +22,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digitalamanmedia.bhumistar.R
+import com.digitalamanmedia.bhumistar.core.components.AnimatedButton
 import com.digitalamanmedia.bhumistar.persentation.authentication.components.OTPScreen
 import com.digitalamanmedia.bhumistar.persentation.authentication.components.TransparentTextField
-import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_viewmodel.UserUiEvent
 
 
 @Composable
@@ -52,7 +47,10 @@ fun UserRegisterScreen(
     onVerifyClickGetOTP:()->Unit,
     onOTPNumberChanged:(String)->Unit,
     icon: ImageVector,
-    visibility: VisualTransformation = VisualTransformation.None
+    visibility: VisualTransformation = VisualTransformation.None,
+    btmEnabled:Boolean = false,
+    isBtnLoading:Boolean,
+    isTextLoading:Boolean
 ) {
     Column (
         modifier = Modifier
@@ -109,7 +107,8 @@ fun UserRegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardType = KeyboardType.NumberPassword,
                 verify = "Get OTP",
-                onClickVerify = onVerifyClickGetOTP
+                onClickVerify = onVerifyClickGetOTP,
+                isTextLoading = isTextLoading
             )
             Spacer(modifier = Modifier.padding(8.dp))
 
@@ -150,7 +149,7 @@ fun UserRegisterScreen(
                 icon = icon,
                 onValueChanged = onPasswordChanged,
                 modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.NumberPassword,
+                keyboardType = KeyboardType.Text,
                 visualTransformation = visibility,
                 onClickVerify = onLoginPasswordVisibilityClick
             )
@@ -179,22 +178,15 @@ fun UserRegisterScreen(
 
 
         }
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(0.4f),
-            onClick = onSubmitClick,
-            border = BorderStroke(1.dp, MaterialTheme.colors.error),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent
-            )
-        ) {
-            Text(
-                text = "Register",
-                color = MaterialTheme.colors.error,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(vertical = 3.dp)
-            )
-        }
+        AnimatedButton(
+            btnName = "Register",
+            onSubmitClick = onSubmitClick,
+            isBtnLoading = isBtnLoading,
+            modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .height(52.dp)
+                .align(Alignment.CenterHorizontally),
+            btmEnabled = btmEnabled
+        )
     }
 }

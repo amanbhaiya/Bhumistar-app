@@ -1,21 +1,17 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,26 +20,28 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digitalamanmedia.bhumistar.R
-import com.digitalamanmedia.bhumistar.persentation.authentication.components.OTPScreen
+import com.digitalamanmedia.bhumistar.core.components.AnimatedButton
 import com.digitalamanmedia.bhumistar.persentation.authentication.components.TransparentTextField
 
 
 @Composable
 fun ForgotPasswordScreen(
     darkTheme:Boolean,
-    number:String,
+    email:String,
     password:String,
-    otp:String,
-    focusRequester:FocusRequester,
-    onNumberChanged:(String)->Unit,
+    cnfPassword:String,
+    onEmailChanged:(String)->Unit,
     onPasswordChanged:(String)->Unit,
     onSubmitClick:()->Unit,
-    onVerifyClick:()->Unit,
+    onClickVerify:()->Unit,
     onForgotPasswordVisibilityClick:()->Unit,
     onLoginTextClick:()->Unit,
-    onOTPNumberChanged:(String)->Unit,
+    onCnfNumberChanged:(String)->Unit,
     icon: ImageVector,
-    visibility: VisualTransformation = VisualTransformation.None
+    visibility: VisualTransformation = VisualTransformation.None,
+    btmEnabled:Boolean = false,
+    isBtnLoading:Boolean,
+    isTextLoading:Boolean
 ) {
 
 
@@ -51,6 +49,7 @@ fun ForgotPasswordScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 16.dp, end = 16.dp)
+                .background(MaterialTheme.colors.surface)
         ) {
 
             if (darkTheme) {
@@ -88,34 +87,37 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.padding(8.dp))
 
             TransparentTextField(
-                text = number,
-                hint = "Enter your number...",
-                leadingText = "+91",
-                onValueChanged = onNumberChanged,
+                text = email,
+                painter = Icons.Default.Person,
+                hint = "Enter your registered email...",
+                onValueChanged = onEmailChanged,
                 modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.NumberPassword,
-                verify = "Get OTP",
-                onClickVerify = onVerifyClick
+                keyboardType = KeyboardType.Email,
+                verify = "Verify",
+                onClickVerify = onClickVerify,
+                isTextLoading = isTextLoading
             )
             Spacer(modifier = Modifier.padding(8.dp))
-            OTPScreen(
-                code = otp,
-                codeLength = 6,
-                focusRequester = focusRequester,
-                onValueChange = onOTPNumberChanged,
-                modifier = Modifier
-                    .width(45.dp)
-                    .height(55.dp),
+            TransparentTextField(
+                text = cnfPassword,
+                hint = "Enter new password...",
+                painter = Icons.Default.VerifiedUser,
+                icon = icon,
+                onValueChanged = onCnfNumberChanged,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardType = KeyboardType.Password,
+                visualTransformation = visibility,
+                onClickVerify = onForgotPasswordVisibilityClick
             )
             Spacer(modifier = Modifier.padding(4.dp))
             TransparentTextField(
                 text = password,
-                hint = "Enter new password...",
+                hint = "Confirm password...",
                 painter = Icons.Default.VerifiedUser,
                 icon = icon,
                 onValueChanged = onPasswordChanged,
                 modifier = Modifier.fillMaxWidth(),
-                keyboardType = KeyboardType.NumberPassword,
+                keyboardType = KeyboardType.Password,
                 visualTransformation = visibility,
                 onClickVerify = onForgotPasswordVisibilityClick
             )
@@ -132,27 +134,17 @@ fun ForgotPasswordScreen(
             )
 
             Spacer(modifier = Modifier.padding(8.dp))
-            OutlinedButton(
+
+            AnimatedButton(
+                btnName = "Submit",
+                onSubmitClick = onSubmitClick,
+                isBtnLoading = isBtnLoading,
                 modifier = Modifier
                     .fillMaxWidth(0.4f)
-                    .padding(4.dp)
+                    .height(52.dp)
                     .align(Alignment.CenterHorizontally),
-                onClick = onSubmitClick,
-                border = BorderStroke(1.dp, MaterialTheme.colors.error),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent
-                )
-
-            ) {
-                Text(
-                    text = "Save",
-                    color = MaterialTheme.colors.error,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(vertical = 3.dp)
-                )
-            }
+                btmEnabled = btmEnabled
+            )
         }
 
 }

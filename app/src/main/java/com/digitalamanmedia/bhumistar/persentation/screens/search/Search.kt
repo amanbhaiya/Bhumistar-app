@@ -1,65 +1,176 @@
 package com.digitalamanmedia.bhumistar.persentation.screens.search
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.R
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Phone
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.BottomNavScreens
-import com.digitalamanmedia.bhumistar.ui.theme.BhumistarDark
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
+import com.digitalamanmedia.bhumistar.R
+import com.digitalamanmedia.bhumistar.core.Commons.Companion.PROPERTY_IMAGE_URL
+import com.digitalamanmedia.bhumistar.core.components.LoadingState
+import com.digitalamanmedia.bhumistar.core.utils.RoundOffRating
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.Screens
+import com.digitalamanmedia.bhumistar.persentation.screens.search.components.SearchBar
+import com.digitalamanmedia.bhumistar.persentation.screens.search.components.SearchItems
+import com.digitalamanmedia.bhumistar.persentation.screens.search.view_modal.SearchUiEvent
+import com.digitalamanmedia.bhumistar.persentation.screens.search.view_modal.SearchViewModal
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import java.lang.IllegalStateException
+
 
 @ExperimentalMaterialApi
 @Composable
-fun SearchScreen(navController: NavController) {
-    val darkTheme = isSystemInDarkTheme()
-    Box(modifier = Modifier
-        .fillMaxSize().
-        background(MaterialTheme.colors.background),
-        contentAlignment = Alignment.Center
+fun SearchScreen(
+    navController: NavController,
+    viewModel: SearchViewModal = hiltViewModel()
+) {
+    val state = viewModel.state.value
+    val refreshState = rememberSwipeRefreshState(isRefreshing = state.onSearchRefresh)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp)
     ) {
-        if (darkTheme) {
-            Image(
-
-                painter = painterResource(id = com.digitalamanmedia.bhumistar.R.drawable.night_logo),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .height(150.dp)
-                    .width(150.dp)
-
+        SearchBar(
+            text = state.search,
+            onValueChanged = {
+                viewModel.onUiEvent(SearchUiEvent.Search(it))
+            },
+            onFocusChanged = {
+                viewModel.onUiEvent(SearchUiEvent.ChangeSearchFocus(it))
+            },
+            onSearchClick = {
+                viewModel.onUiEvent(SearchUiEvent.SearchQuery)
+            }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        if (state.isLoading){
+            LoadingState(
+                modifier = Modifier.align(CenterHorizontally),
+                fontSize = 22.sp,
+                circleSize = 4.dp,
+                travelDistance = 14.dp,
+                spaceBetween = 5.dp
             )
-        } else {
-            Image(
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = "${state.listSize} Results Found | Property for -> ${state.searchTextWord}",
+            color = MaterialTheme.colors.primaryVariant,
+            fontSize = 20.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
 
-                painter = painterResource(id = com.digitalamanmedia.bhumistar.R.drawable.bhumistar),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .height(150.dp)
-                    .width(150.dp)
+        SwipeRefresh(
+            state = refreshState,
+            onRefresh = {
+                viewModel.onUiEvent(SearchUiEvent.OnSearchRefresh)
+            }
+        ) {
 
-            )
+
+            if (state.noData) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    item {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = "Oops.",
+                            color = MaterialTheme.colors.error,
+                            fontSize = 35.sp
+                        )
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    item {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = state.searchTextResult,
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontSize = 30.sp
+                        )
+                    }
+                }
+            }
+            LazyColumn {
+                items(state.propertyList) { item ->
+
+                    val a = item.comments?.map {
+                        it.rating
+                    }
+                    val c = a?.sumOf { it ?: 0 }
+                    val b = if (a?.size == 0) {
+                        0.0f
+                    } else {
+                        c?.div(a.size)?.toFloat()
+                    }
+                    val rating = RoundOffRating.rating(b?:0.0F)
+                    SearchItems(onItemClick = {
+//                        val i = Intent(context.applicationContext, DetailActivity::class.java).apply {
+//                            putExtra("id",item.id)
+//                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//                        }
+//                        context.startActivity(i)
+                        try {
+                            navController.navigate(
+                                Screens.PropertyDetail.route + "?id=${item.id}"
+                            ) {
+                                launchSingleTop = true
+                                navController.graph.route?.let {
+                                    popUpTo(it)
+                                }
+                                restoreState = true
+                            }
+                        }catch (e : IllegalStateException){
+
+                        }
+                    },
+                        painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(PROPERTY_IMAGE_URL + item.pic_one)
+                                .crossfade(1000)
+                                .placeholder(R.drawable.bhumistarjpg)
+                                .size(Size.ORIGINAL) // Set the target size to load the image at.
+                                .build()
+                        ),
+                        propertyName = item.property_name,
+                        propertyType = item.property_type,
+                        vendorName = item.vendor_name,
+                        vendorType = item.vendor_type,
+                        netPrice = item.net_price,
+                        priceSQFT = item.price_sq_ft,
+                        address = item.property_address,
+                        reviews = item.comments?.size.toString(),
+                        rating = rating
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                item {
+                    Spacer(modifier = Modifier.height(70.dp))
+                }
+            }
         }
     }
-
-
 }
+
 
 

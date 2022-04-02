@@ -9,6 +9,7 @@ class NormalResponseDto(
 
 fun NormalResponseDto.toNormalResponseModal(): NormalResponseModal {
         return NormalResponseModal(
+            status = status,
             message = message
         )
     }

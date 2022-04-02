@@ -2,25 +2,29 @@ package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.use
 
 
 import android.app.Application
-
-import android.widget.Toast
+import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.digitalamanmedia.bhumistar.persentation.MainActivity
+import com.digitalamanmedia.bhumistar.core.Commons.Companion.ALREADY_LOGIN_USER
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.FAILED_OTP
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.FULL_OTP
 
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.SUCCESS_OTP
-import com.digitalamanmedia.bhumistar.core.utils.Resourse
-import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.CheckPhoneNumberDto
+import com.digitalamanmedia.bhumistar.core.Commons.Companion.VALID_PASSWORD
+import com.digitalamanmedia.bhumistar.core.utils.Resource
+import com.digitalamanmedia.bhumistar.data.local.dataModal.UserData
+import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.CheckEmailDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.CreateUserDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.LoginUserDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.UpdatePasswordDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.otpDto.OtpDto
 import com.digitalamanmedia.bhumistar.domain.use_cases.AllUseCases
-import com.digitalamanmedia.bhumistar.domain.use_cases.authentication.SendOTPUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -31,12 +35,14 @@ import kotlin.random.Random
 @HiltViewModel
 class UserAuthViewModel @Inject constructor (
     private val allUseCases: AllUseCases,
-    private val context:Application
+    private val context: Application
 ): ViewModel(){
 
     private val _userState = mutableStateOf(UserAuthState())
     val state: State<UserAuthState> = _userState
 
+    private val _id = mutableStateOf(0)
+    val id: State<Int> = _id
 
     // for user login
     private val _loginEmail = mutableStateOf("")
@@ -46,14 +52,14 @@ class UserAuthViewModel @Inject constructor (
     val loginPassword: State<String> = _loginPassword
 
     // for user password update
-    private val _forgotNumber = mutableStateOf("")
-    val forgotNumber: State<String> = _forgotNumber
+    private val _forgotEmail = mutableStateOf("")
+    val forgotEmail: State<String> = _forgotEmail
 
     private val _forgotPassword = mutableStateOf("")
     val forgotPassword: State<String> = _forgotPassword
 
-    private val _forgotOtp = mutableStateOf("")
-    val forgotOtp: State<String> = _forgotOtp
+    private val _forgotCnfPassword = mutableStateOf("")
+    val forgotCnfPassword: State<String> = _forgotCnfPassword
 
 
     // for user registration
@@ -75,6 +81,16 @@ class UserAuthViewModel @Inject constructor (
 
     private val random = Random.nextInt(111111,999999)
     private val otp:String = random.toString()
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    private fun startNewActivity(){
+        val intent = Intent(context.applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        context.startActivity(intent)
+    }
 
 
     fun onUiEvent(event: UserUiEvent){
@@ -100,11 +116,11 @@ class UserAuthViewModel @Inject constructor (
             is UserUiEvent.EnterLoginPassword->{
                 _loginPassword.value = event.loginPassword
             }
-            is UserUiEvent.EnterForgotNumber->{
-                _forgotNumber.value = event.forgotNumber
+            is UserUiEvent.EnterForgotEmail->{
+                _forgotEmail.value = event.forgotEmail
             }
-            is UserUiEvent.EnterForgotOTP->{
-                _forgotOtp.value = event.forgotOTP
+            is UserUiEvent.EnterForgotCnfPassword->{
+                _forgotCnfPassword.value = event.forgotCnfPassword
             }
             is UserUiEvent.EnterForgotPassword->{
                 _forgotPassword.value = event.forgotPassword
@@ -117,16 +133,20 @@ class UserAuthViewModel @Inject constructor (
                 )
                            }
             is UserUiEvent.VerifyOTP->{
-
-              if (userOtp.value.length == 6){
-                  if(userOtp.value == otp){
-                      Toast.makeText(context.applicationContext,SUCCESS_OTP,Toast.LENGTH_LONG).show()
-                  }else{
-                      Toast.makeText(context.applicationContext, FAILED_OTP,Toast.LENGTH_LONG).show()
-                  }
-              }else{
-                  Toast.makeText(context.applicationContext, FULL_OTP,Toast.LENGTH_LONG).show()
-              }
+                viewModelScope.launch {
+                    if (userOtp.value.length == 6){
+                        if(userOtp.value == otp){
+                            _userState.value = state.value.copy(
+                                registerBtnEnabled = true
+                            )
+                            _eventFlow.emit(UiEvent.ShowSnackBar(SUCCESS_OTP))
+                        }else{
+                            _eventFlow.emit(UiEvent.ShowSnackBar(FAILED_OTP))
+                        }
+                    }else{
+                        _eventFlow.emit(UiEvent.ShowSnackBar(FULL_OTP))
+                    }
+                }
             }
 
             is UserUiEvent.RegisterUser->{
@@ -138,13 +158,53 @@ class UserAuthViewModel @Inject constructor (
                 )
             }
             is UserUiEvent.LoginUser->{
-
+                getResponseLoginUser(
+                    email = loginEmail.value,
+                    password = loginPassword.value
+                )
             }
             is UserUiEvent.SavePassword->{
-
+                viewModelScope.launch {
+                    if (forgotCnfPassword.value == forgotPassword.value) {
+                        getResponseUpdatePassword(
+                            email = forgotEmail.value,
+                            password = forgotCnfPassword.value
+                        )
+                    } else {
+                        _eventFlow.emit(UiEvent.ShowSnackBar(VALID_PASSWORD))
+                    }
+                }
+            }
+            is UserUiEvent.ForgotCheckEmail->{
+                getResponseCheckEmail(
+                    email = forgotEmail.value
+                )
+            }
+            is UserUiEvent.ForgotTextClick->{
+                _userState.value = state.value.copy(
+                    isPassword = true
+                )
+            }
+            is UserUiEvent.LoginTextClick->{
+                _userState.value = state.value.copy(
+                    isLogin = true,
+                    isPassword = false
+                )
+            }
+            is UserUiEvent.RegisterTextClick->{
+                _userState.value = state.value.copy(
+                    isLogin = false
+                )
+            }
+            is UserUiEvent.TogglePasswordVisibility->{
+                _userState.value = state.value.copy(
+                   passwordVisibility = !state.value.passwordVisibility
+                )
             }
         }
     }
+
+
     private fun getResponseToSendOtp(number:String, message:String){
         allUseCases.sendOTPUseCase(
             otpDto = OtpDto(
@@ -154,21 +214,21 @@ class UserAuthViewModel @Inject constructor (
         ).onEach { result->
             when(result){
 
-                is Resourse.Loading->{
+                is Resource.Loading->{
                     _userState.value = state.value.copy(
-                        isLoading = true
+                        isRegisterTextLoading = true
                     )
                 }
-                is Resourse.Success->{
-                    Toast.makeText(context.applicationContext, result.data.message,Toast.LENGTH_LONG).show()
+                is Resource.Success->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.data.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isRegisterTextLoading = false
                     )
                 }
-                is Resourse.Error->{
-                    Toast.makeText(context.applicationContext,result.message,Toast.LENGTH_LONG).show()
+                is Resource.Error->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isRegisterTextLoading = false
                     )
                 }
             }
@@ -185,21 +245,36 @@ class UserAuthViewModel @Inject constructor (
         ).onEach { result->
             when(result){
 
-                is Resourse.Loading->{
+                is Resource.Loading->{
                     _userState.value = state.value.copy(
-                        isLoading = true
+                        isRegisterBtnLoading = true
                     )
                 }
-                is Resourse.Success->{
-                    Toast.makeText(context.applicationContext, result.data.message,Toast.LENGTH_LONG).show()
+                is Resource.Success->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.data.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isRegisterBtnLoading = false
                     )
+                    if (result.data.status == 1){
+                        allUseCases.saveUserDataUseCase(
+                            UserData(
+                                id = 0,
+                                district = null,
+                                number = number,
+                                name = name,
+                                email = email,
+                                state = null,
+                                pin_code = null,
+                            )
+                        )
+                        allUseCases.verificationAlreadyLoginUseCase.createUserKey(value = ALREADY_LOGIN_USER)
+                        startNewActivity()
+                    }
                 }
-                is Resourse.Error->{
-                    Toast.makeText(context.applicationContext,result.message,Toast.LENGTH_LONG).show()
+                is Resource.Error->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isRegisterBtnLoading = false
                     )
                 }
             }
@@ -214,82 +289,108 @@ class UserAuthViewModel @Inject constructor (
         ).onEach { result->
             when(result){
 
-                is Resourse.Loading->{
+                is Resource.Loading->{
                     _userState.value = state.value.copy(
-                        isLoading = true
+                        isLoginBtnLoading = true,
                     )
                 }
-                is Resourse.Success->{
-                    Toast.makeText(context.applicationContext, result.data.message,Toast.LENGTH_LONG).show()
+                is Resource.Success->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.data.message))
+
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isLoginBtnLoading = false
                     )
+                    if (result.data.status == 1){
+                        allUseCases.saveUserDataUseCase(
+                            UserData(
+                                id = result.data.data?.id,
+                                district = result.data.data?.district,
+                                number = result.data.data?.number,
+                                name = result.data.data?.name,
+                                email = result.data.data?.email,
+                                state = result.data.data?.state,
+                                pin_code = result.data.data?.pin_code,
+                            )
+                        )
+                        allUseCases.verificationAlreadyLoginUseCase.createUserKey(value = ALREADY_LOGIN_USER)
+                        startNewActivity()
+                    }
                 }
-                is Resourse.Error->{
-                    Toast.makeText(context.applicationContext,result.message,Toast.LENGTH_LONG).show()
+                is Resource.Error->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isLoginBtnLoading = false
                     )
                 }
             }
         }.launchIn(viewModelScope)
     }
-    private fun getResponseUpdatePassword(number:String, password: String){
+    private fun getResponseUpdatePassword(email:String, password: String){
         allUseCases.updatePasswordUseCase(
             updatePasswordDto = UpdatePasswordDto(
-                number = number,
+                email = email,
                 password = password
             )
         ).onEach { result->
             when(result){
 
-                is Resourse.Loading->{
+                is Resource.Loading->{
                     _userState.value = state.value.copy(
-                        isLoading = true
+                        isSubmitBtnLoading = true
                     )
                 }
-                is Resourse.Success->{
-                    Toast.makeText(context.applicationContext, result.data.message,Toast.LENGTH_LONG).show()
+                is Resource.Success->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.data.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isSubmitBtnLoading = false
                     )
                 }
-                is Resourse.Error->{
-                    Toast.makeText(context.applicationContext,result.message,Toast.LENGTH_LONG).show()
+                is Resource.Error->{
+                    _eventFlow.emit(UiEvent.ShowSnackBar(result.message))
                     _userState.value = state.value.copy(
-                        isLoading = false
+                        isSubmitBtnLoading = false
                     )
                 }
             }
         }.launchIn(viewModelScope)
     }
-    private fun getResponseCheckNumber(number:String){
-        allUseCases.checkNumberUseCase(
-            checkPhoneNumberDto = CheckPhoneNumberDto(
-                user_ph_number = number
-            )
-        ).onEach { result->
-            when(result){
+    private fun getResponseCheckEmail(email:String){
+            allUseCases.checkEmailUseCase(
+                checkEmailDto = CheckEmailDto(
+                    email = email
+                )
+            ).onEach { result ->
+                when (result) {
 
-                is Resourse.Loading->{
-                    _userState.value = state.value.copy(
-                        isLoading = true
-                    )
+                    is Resource.Loading -> {
+                        _userState.value = state.value.copy(
+                            isSubmitTextLoading = true
+                        )
+                    }
+                    is Resource.Success -> {
+                        _eventFlow.emit(UiEvent.ShowSnackBar(result.data.message))
+                        if (result.data.status == 1) {
+                            _userState.value = state.value.copy(
+                                passwordBtnEnabled = true
+                            )
+                        }
+                        _userState.value = state.value.copy(
+                            isSubmitTextLoading = false
+                        )
+                    }
+                    is Resource.Error -> {
+                        _eventFlow.emit(UiEvent.ShowSnackBar(result.message))
+                        _userState.value = state.value.copy(
+                            isSubmitTextLoading = false,
+                            passwordBtnEnabled = true
+                        )
+                    }
                 }
-                is Resourse.Success->{
-                    Toast.makeText(context.applicationContext, result.data.message,Toast.LENGTH_LONG).show()
-                    _userState.value = state.value.copy(
-                        isLoading = false
-                    )
-                }
-                is Resourse.Error->{
-                    Toast.makeText(context.applicationContext,result.message,Toast.LENGTH_LONG).show()
-                    _userState.value = state.value.copy(
-                        isLoading = false
-                    )
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
+
+    }
+    sealed class UiEvent{
+        data class ShowSnackBar(val message: String): UiEvent()
     }
 
 }

@@ -3,10 +3,12 @@ package com.digitalamanmedia.bhumistar.persentation.authentication.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
@@ -15,6 +17,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.digitalamanmedia.bhumistar.core.components.CircleLoadingState
 import com.digitalamanmedia.bhumistar.ui.theme.Bhumistar
 
 
@@ -31,7 +34,8 @@ fun TransparentTextField(
     keyboardType: KeyboardType,
     verify: String = "",
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    icon:ImageVector? = null
+    icon:ImageVector? = null,
+    isTextLoading:Boolean = false
 
 ) {
     Box(modifier = modifier) {
@@ -45,7 +49,6 @@ fun TransparentTextField(
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType
             ),
-
             label = {
                 Text(
                     text = hint,
@@ -84,16 +87,25 @@ fun TransparentTextField(
                         )
                     }
                 }
-                TextButton(
-                    onClick = onClickVerify,
+                Box {
+                    if (isTextLoading) {
+                        CircleLoadingState(
+                            circleSize = 13.dp,
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                                .padding(top = 4.dp, end = 4.dp)
+                        )
+                    } else {
+                        TextButton(
+                            onClick = onClickVerify,
+                        ) {
+                            Text(
+                                text = verify,
+                                color = Bhumistar,
+                                fontSize = 18.sp
 
-                ) {
-                    Text(
-                        text = verify,
-                        color = Bhumistar,
-                        fontSize = 18.sp
-
-                    )
+                            )
+                        }
+                    }
                 }
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(

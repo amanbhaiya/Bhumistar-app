@@ -7,18 +7,21 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
-import com.digitalamanmedia.bhumistar.MainActivity
 import com.digitalamanmedia.bhumistar.core.Commons
-import com.digitalamanmedia.bhumistar.core.Commons.Companion.NAME
-import com.digitalamanmedia.bhumistar.persentation.authentication.Authentication
-import com.digitalamanmedia.bhumistar.persentation.utils.DataPreference
+import com.digitalamanmedia.bhumistar.domain.repository.local.OnBoardingDataStoreRepository
+import com.digitalamanmedia.bhumistar.domain.use_cases.AllUseCases
+import com.digitalamanmedia.bhumistar.persentation.MainActivity
+import com.digitalamanmedia.bhumistar.persentation.authentication.AuthenticationActivity
 import com.digitalamanmedia.bhumistar.ui.theme.BhumistarTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
 @AndroidEntryPoint
 class OnBoardingActivity : ComponentActivity() {
+    @Inject lateinit var allUseCases: AllUseCases
     @ExperimentalPagerApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +32,9 @@ class OnBoardingActivity : ComponentActivity() {
             val itemsLight = Commons.getLight()
             val itemsDark = Commons.getDark()
             val darkTheme = isSystemInDarkTheme()
-            val preferences = DataPreference(this)
             BhumistarTheme {
-                    val intent = Intent(this, Authentication::class.java)
+//                    val intent = Intent(this, AuthenticationActivity::class.java)
+                val intent = Intent(this, MainActivity::class.java)
                 if (darkTheme){
                     OnBoardingScreenAll(
                         items = itemsDark,
@@ -43,17 +46,14 @@ class OnBoardingActivity : ComponentActivity() {
                                         state.scrollToPage(state.currentPage+1)
                                     }
                                 }else{
-                                    preferences.save(key = NAME,true)
+                                    allUseCases.onBoardingUseCase.write(value = true)
                                     startActivity(intent)
                                     finish()
                                 }
                             }
                         },
                         onBackClick = {
-                            if (state.currentPage == 0){
-
-                            }else{
-
+                            if (state.currentPage != 0){
                                 scope.launch {
                                     state.scrollToPage(state.currentPage-1)
 
@@ -62,7 +62,7 @@ class OnBoardingActivity : ComponentActivity() {
                         },
                         onSkipClick = {
                             scope.launch {
-                                preferences.save(key = NAME,true)
+                                allUseCases.onBoardingUseCase.write(value = true)
                             }
 
                             startActivity(intent)
@@ -81,7 +81,7 @@ class OnBoardingActivity : ComponentActivity() {
                                         state.scrollToPage(state.currentPage+1)
                                     }
                                 }else{
-                                    preferences.save(key = NAME,true)
+                                    allUseCases.onBoardingUseCase.write(value = true)
                                     startActivity(intent)
                                     finish()
                                 }
@@ -100,7 +100,7 @@ class OnBoardingActivity : ComponentActivity() {
                         },
                         onSkipClick = {
                             scope.launch {
-                                preferences.save(key = NAME,true)
+                                allUseCases.onBoardingUseCase.write(value = true)
                             }
 
                             startActivity(intent)

@@ -1,30 +1,26 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens
 
-import android.opengl.Visibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.digitalamanmedia.bhumistar.R
+import com.digitalamanmedia.bhumistar.core.components.AnimatedButton
 import com.digitalamanmedia.bhumistar.persentation.authentication.components.TransparentTextField
 
 
@@ -40,13 +36,16 @@ fun LoginScreen(
     onForgotTextClick:()->Unit,
     onRegisterTextClick:()->Unit,
     icon:ImageVector,
-    visibility: VisualTransformation = VisualTransformation.None
+    visibility: VisualTransformation = VisualTransformation.None,
+    btmEnabled:Boolean = false,
+    isBtnLoading:Boolean
 ) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp)
+            .background(MaterialTheme.colors.surface)
     ) {
 
         if (darkTheme) {
@@ -86,7 +85,7 @@ fun LoginScreen(
         TransparentTextField(
             text = email,
             hint = "Enter your Email...",
-            leadingText = "+91",
+            painter = Icons.Default.Person,
             onValueChanged = onEmailChanged,
             modifier = Modifier.fillMaxWidth(),
             keyboardType = KeyboardType.Text,
@@ -116,7 +115,8 @@ fun LoginScreen(
                 text = "Click here",
                 color = MaterialTheme.colors.error,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(vertical = 3.dp)
+                modifier = Modifier
+                    .padding(vertical = 3.dp)
                     .clickable {
                         onRegisterTextClick()
                     }
@@ -135,7 +135,8 @@ fun LoginScreen(
                 text = "Click here",
                 color = MaterialTheme.colors.error,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(vertical = 3.dp)
+                modifier = Modifier
+                    .padding(vertical = 3.dp)
                     .clickable {
                         onForgotTextClick()
                     }
@@ -143,26 +144,15 @@ fun LoginScreen(
         }
 
         Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedButton(
+        AnimatedButton(
+            btnName = "Login",
+            onSubmitClick = onSubmitClick,
+            isBtnLoading = isBtnLoading,
             modifier = Modifier
                 .fillMaxWidth(0.4f)
-                .padding(4.dp)
+                .height(52.dp)
                 .align(Alignment.CenterHorizontally),
-            onClick = onSubmitClick,
-            border = BorderStroke(1.dp, MaterialTheme.colors.error),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                backgroundColor = Color.Transparent
-            )
-
-        ) {
-            Text(
-                text = "Login",
-                color = MaterialTheme.colors.error,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(vertical = 3.dp)
-            )
-        }
+            btmEnabled = btmEnabled
+        )
     }
 }

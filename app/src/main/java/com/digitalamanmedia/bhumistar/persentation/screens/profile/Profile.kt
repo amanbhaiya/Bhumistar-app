@@ -1,468 +1,472 @@
 package com.digitalamanmedia.bhumistar.persentation.screens.profile
 
 
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
-
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
-
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.digitalamanmedia.bhumistar.R
 import com.digitalamanmedia.bhumistar.core.Commons
-import com.digitalamanmedia.bhumistar.persentation.screens.profile.component.Dropdown
-import com.digitalamanmedia.bhumistar.persentation.screens.profile.component.ProfileTextField
+import com.digitalamanmedia.bhumistar.core.Commons.Companion.LOGO
+import com.digitalamanmedia.bhumistar.core.components.CircleLoadingState
+import com.digitalamanmedia.bhumistar.persentation.authentication.AuthenticationActivity
+import com.digitalamanmedia.bhumistar.persentation.property_uplaod.viewModel.ListPropertyUiEvent
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.component.ProfileUpdateForm
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.profile_screens.PrivacyPolicy
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.profile_screens.TermsAndConditions
 import com.digitalamanmedia.bhumistar.persentation.screens.profile.utils.GetDistrict
 import com.digitalamanmedia.bhumistar.persentation.screens.profile.utils.StateAndDistrict
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.view_model.ProfileUserUiEvent
+import com.digitalamanmedia.bhumistar.persentation.screens.profile.view_model.ProfileViewModal
 import com.digitalamanmedia.bhumistar.ui.theme.Bhumistar
 import com.digitalamanmedia.bhumistar.ui.theme.YellowP
 
 @Composable
-fun ProfileScreen() {
-    val scrollState = rememberScrollState()
+fun ProfileScreen(
+    viewModal: ProfileViewModal = hiltViewModel()
+) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        viewModal.onUiEvent(ProfileUserUiEvent.GetPictureUri(uri))
+    }
+    val context = LocalContext.current
     val scrollStateDropDownState = rememberScrollState()
     val scrollStateDropDownDistrict = rememberScrollState()
-    var states by remember {
-        mutableStateOf("")
+
+    val state = viewModal.profileState.value
+    val icon = if (state.passwordVisibility || state.passwordVisibilityCnf){
+        Icons.Default.VisibilityOff
+    }else{
+        Icons.Default.Visibility
     }
-    var cities by remember {
-        mutableStateOf("")
-    }
-    var pinCode by remember {
-        mutableStateOf("")
-    }
-    var name by remember {
-        mutableStateOf("Bhumistar")
-    }
-    var number by remember {
-        mutableStateOf("9089475635")
-    }
-    var email by remember {
-        mutableStateOf("bhumistar@gmail.com")
-    }
-    var isReadable by remember {
-        mutableStateOf(true)
-    }
-    var isEnable by remember {
-        mutableStateOf(false)
-    }
-    var expandedState by remember {
-        mutableStateOf(false)
-    }
-    var expandedCity by remember {
-        mutableStateOf(false)
+    val visibility =  if (state.passwordVisibility || state.passwordVisibilityCnf){
+        VisualTransformation.None
+    }else{
+        PasswordVisualTransformation()
     }
 
 
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
-            .verticalScroll(scrollState)
-    ) {
-
-        Card(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.1f),){
-
-           Row(modifier = Modifier
-               .fillMaxSize()
-               .padding(horizontal = 16.dp, vertical = 16.dp),
-               verticalAlignment = Alignment.CenterVertically
-           ) {
-               Image(
-                   painter = painterResource(id = R.drawable.bhumistarjpg),
-                   contentDescription ="",
-                   modifier = Modifier
-                       .clip(CircleShape)
-                       .fillMaxHeight()
-                       .fillMaxWidth(0.2f)
-               )
-
-               Column(
-                   modifier = Modifier
-                       .fillMaxWidth(0.8f)
-                       .fillMaxHeight()
-                       .padding(horizontal = 16.dp, vertical = 8.dp),
-                   verticalArrangement = Arrangement.Center
-               ) {
-                   Text(
-                       modifier = Modifier
-                           .fillMaxWidth()
-                           .clickable {
-
-                           },
-                       text = "Bhumistar",
-                       fontSize = 17.sp,
-                       fontWeight = FontWeight.SemiBold,
-                       color = MaterialTheme.colors.error
-                   )
-                   Text(
-                       modifier = Modifier
-                           .fillMaxWidth()
-                           .clickable {
-
-                           },
-                       text = "bhumistar@gmail.com",
-                       fontSize = 14.sp,
-                       color = MaterialTheme.colors.primaryVariant
-                   )
-
-               }
-
-
-           }
-       }
-        Spacer(modifier = Modifier.height(25.dp))
-
-        Card(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.06f),){
-
-            Row(modifier = Modifier
-                .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth(0.8F)
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Phone,
-                        contentDescription = "",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(Bhumistar)
-                            .padding(8.dp)
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .clickable {
-
-                            },
-                        text = "Contact Us",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colors.primaryVariant
-                    )
-                }
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.KeyboardArrowRight,
-                            contentDescription = "text",
-                            tint = MaterialTheme.colors.error
-                        )
-
-                    }
-                }
-            }
+    Scaffold {
+        if (viewModal.profileState.value.isTerms && !viewModal.profileState.value.isPrivacy){
+            TermsAndConditions(viewModel = viewModal)
         }
-        Spacer(modifier = Modifier.height(3.dp))
-
-        Card(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.06f),){
-
-            Row(modifier = Modifier
-                .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth(0.8F)
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = "",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(Green)
-                            .padding(8.dp)
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .clickable {
-
-                            },
-                        text = "Term of use",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colors.primaryVariant
-                    )
-                }
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.KeyboardArrowRight,
-                            contentDescription = "text",
-                            tint = MaterialTheme.colors.error
-                        )
-
-                    }
-                }
-            }
+        if (viewModal.profileState.value.isPrivacy && !viewModal.profileState.value.isTerms){
+            PrivacyPolicy(viewModel = viewModal)
         }
-        Spacer(modifier = Modifier.height(3.dp))
-
-        Card(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.06f),){
-
-            Row(modifier = Modifier
-                .fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically
+        if (!viewModal.profileState.value.isPrivacy && !viewModal.profileState.value.isTerms) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth(0.8F)
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Lock,
-                        contentDescription = "",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(YellowP)
-                            .padding(8.dp)
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .clickable {
+                item {
 
-                            },
-                        text = "Privacy policy",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colors.primaryVariant
-                    )
-                }
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    IconButton(
-                        onClick = { },
+                    Card(
                         modifier = Modifier
-                            .padding(8.dp)
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.1f),
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.KeyboardArrowRight,
-                            contentDescription = "text",
-                            tint = MaterialTheme.colors.error
-                        )
 
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(25.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp, vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-            ) {
-               Row(
-                   modifier = Modifier
-                   .fillMaxWidth(),
-                   verticalAlignment = Alignment.CenterVertically,
-                   horizontalArrangement = Arrangement.SpaceBetween
-               ) {
-                   Text(
 
-                       text = "Your Profile",
-                       fontSize = 20.sp,
-                       fontWeight = FontWeight.SemiBold,
-                       color = MaterialTheme.colors.primaryVariant
-                   )
-                   IconButton(
-                       onClick = {
-                           isEnable = true
-                           isReadable = false
-                       }
-                   ) {
-                       Icon(imageVector = Icons.Outlined.Create,
-                           contentDescription = "",
-                           tint = Color.White,
-                           modifier = Modifier
-                               .clip(CircleShape)
-                               .background(Bhumistar)
-                               .padding(8.dp)
-                       )
-                   }
-               }
-                Spacer(modifier = Modifier.height(8.dp))
-                ProfileTextField(
-                    value = name,
-                    isEnabled = isEnable,
-                    isRead = isReadable,
-                    onValueChanged = {
-                        name = it
-                    },
-                    onClearClick = {
-                        name = ""
-                    }
-                )
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(Commons.IMAGE_URL + state.userImageUri)
+                                        .crossfade(1000)
+                                        .placeholder(R.drawable.bhumistarjpg)
+                                        .size(Size.ORIGINAL) // Set the target size to load the image at.
+                                        .build()
+                                ),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(85.dp)
+                                    .clickable {
+                                        launcher.launch("image/*")
+                                    },
+                                contentScale = ContentScale.Crop
+                            )
 
-                Spacer(modifier = Modifier.height(16.dp))
-                ProfileTextField(
-                    value = number,
-                    isEnabled = isEnable,
-                    isRead = isReadable,
-                    onValueChanged = {
-                        number = it
-                    },
-                    onClearClick = {
-                        number = ""
-                    }
-                )
 
-                Spacer(modifier = Modifier.height(16.dp))
-                ProfileTextField(
-                    value = email,
-                    isEnabled = isEnable,
-                    isRead = isReadable,
-                    onValueChanged = {
-                        email = it
-                    },
-                    onClearClick = {
-                    }
-                )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
 
-                Spacer(modifier = Modifier.height(16.dp))
-                Dropdown(
-                    hint = "Select your State",
-                    value = states,
-                    expanded = expandedState,
-                    onValueChanged = {
-                        states = it
-                    },
-                    onDropDownClick = {
-                        expandedState = !expandedState
-                    },
+                                        },
+                                    text = if(viewModal.userName.value.isEmpty())"Bhumistar" else viewModal.userName.value,
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colors.error
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
 
-                    onClickItems = {state->
-                        if (state != states){
-                            states = ""
-                            states = state
-                            cities = ""
+                                        },
+                                    text =if(viewModal.userEmail.value.isEmpty())"bhumistar@gmail.com" else viewModal.userEmail.value,
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colors.primaryVariant
+                                )
+
+                            }
+
+
                         }
+                    }
+                    Spacer(modifier = Modifier.height(25.dp))
+                }
+                item {
 
-                        expandedState = false
-                    },
-                    list = StateAndDistrict.getState(),
-                    scrollState = scrollStateDropDownState
-                )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.06f),
+                    ) {
 
-                Dropdown(
-                    hint = "Select your District",
-                    value = cities,
-                    expanded = expandedCity,
-                    onValueChanged = {
-                        cities = it
-                    },
-                    onDropDownClick = {
-                        expandedCity = !expandedCity
-                    },
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
+                                    viewModal.onUiEvent(ProfileUserUiEvent.TermsIsVisible)
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8F)
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Info,
+                                    contentDescription = "",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(Green)
+                                        .padding(8.dp)
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp),
+                                    text = "Terms and Conditions",
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colors.primaryVariant
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        viewModal.onUiEvent(ProfileUserUiEvent.TermsIsVisible)
+                                    },
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.KeyboardArrowRight,
+                                        contentDescription = "text",
+                                        tint = MaterialTheme.colors.error
+                                    )
 
-                    onClickItems = {city->
-                        cities = ""
-                        cities = city
-                        expandedCity = false
-                    },
-                    list = GetDistrict.getDistrict(states),
-                    scrollState = scrollStateDropDownDistrict
-                )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(3.dp))
+                }
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.06f),
+                    ) {
 
-                ProfileTextField(
-                    value = pinCode,
-                    onValueChanged = {
-                        pinCode = it
-                    },
-                    onClearClick = {
-                        pinCode = ""
-                    },
-                    hint = "Enter Your PinCode",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    )
-                )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
 
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick ={
-                        isEnable = false
-                        isReadable = true
-                    },
-                    border = BorderStroke(1.dp, MaterialTheme.colors.error),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = Color.Transparent
-                    )
-                ) {
-                    Text(
-                        text = "Submit",
-                        color = MaterialTheme.colors.error,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(3.dp),
-                        fontSize = 17.sp
+                                    viewModal.onUiEvent(ProfileUserUiEvent.PrivacyIsVisible)
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8F)
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Lock,
+                                    contentDescription = "",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(YellowP)
+                                        .padding(8.dp)
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp),
+                                    text = "Privacy policy",
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colors.primaryVariant
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        viewModal.onUiEvent(ProfileUserUiEvent.PrivacyIsVisible)
+                                    },
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.KeyboardArrowRight,
+                                        contentDescription = "text",
+                                        tint = MaterialTheme.colors.error
+                                    )
+
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(3.dp))
+                }
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.06f),
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
+                                    val intent = Intent(context.applicationContext,
+                                        AuthenticationActivity::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                    }
+                                    context.startActivity(intent)
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8F)
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Person,
+                                    contentDescription = "",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(Bhumistar)
+                                        .padding(8.dp)
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp),
+                                    text = "Register as Vendor/User",
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colors.primaryVariant
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        val intent = Intent(context.applicationContext,
+                                            AuthenticationActivity::class.java).apply {
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                        context.startActivity(intent)
+                                    },
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.KeyboardArrowRight,
+                                        contentDescription = "text",
+                                        tint = MaterialTheme.colors.error
+                                    )
+
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(25.dp))
+                }
+                item {
+                    ProfileUpdateForm(
+                        name = viewModal.name.value,
+                        number = viewModal.number.value,
+                        email = viewModal.email.value,
+                        state = viewModal.state.value,
+                        city = viewModal.city.value,
+                        pinCode = viewModal.pinCode.value,
+                        password = viewModal.password.value,
+                        cnfPassword = viewModal.cnfPassword.value,
+                        onNameChanged = { viewModal.onUiEvent(ProfileUserUiEvent.EnterName(it)) },
+                        onNumberChanged = { viewModal.onUiEvent(ProfileUserUiEvent.EnterNumber(it)) },
+                        onEmailChanged = { viewModal.onUiEvent(ProfileUserUiEvent.EnterEmail(it)) },
+                        onStateChanged = { viewModal.onUiEvent(ProfileUserUiEvent.EnterState(it)) },
+                        onCityChanged = { viewModal.onUiEvent(ProfileUserUiEvent.EnterCity(it)) },
+                        onPinCodeChanged = { viewModal.onUiEvent(ProfileUserUiEvent.EnterPinCode(it)) },
+                        onPasswordChanged = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.EnterPassword(it))
+                        },
+                        onCnfPasswordChanged = {
+                            viewModal.onUiEvent(
+                                ProfileUserUiEvent.EnterConfirmPassword(
+                                    it
+                                )
+                            )
+                        },
+                        isEnable = state.isEnable,
+                        isReadable = state.isReadable,
+                        icon = icon,
+                        visibility = visibility,
+                        onEditClick = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnEditClick)
+                        },
+                        onNameClear = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnNameClear)
+                        },
+                        onNumberClear = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnNumberClear)
+                        },
+                        onEmailClear = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnEmailClear)
+                        },
+                        onPinCodeClear = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnPinCodeClear)
+                        },
+                        onPasswordIconToggle = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.TogglePassword)
+                        },
+                        onCnfPasswordIconToggle = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.ToggleCnfPassword)
+                        },
+                        expandedCity = state.expandedCity,
+                        expandedState = state.expandedState,
+                        onStateDropDown = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnStateDrop)
+                        },
+                        onCityDropDown = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnCityDrop)
+                        },
+                        onStateItemClick = { state ->
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnStateClick(state))
+                        },
+                        onCityItemClick = { city ->
+                            viewModal.onUiEvent(ProfileUserUiEvent.OnCityClick(city))
+                        },
+                        listStates = StateAndDistrict.getState(),
+                        listCities = GetDistrict.getDistrict(viewModal.state.value),
+                        onSubmitClick = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.UpdateUser)
+//                    snackBarManager.getScope().launch {
+//                       viewModal.eventFlow.collectLatest { event->
+//                           when(event){
+//                              is  ProfileViewModal.ProfileUiEvent.ShowSnackBar->{
+//                                   snackBarManager.showSnackBar(
+//                                       scaffoldState = scaffoldState,
+//                                       message = event.message,
+//                                       actionLevel = "DISMISS"
+//                                   )
+//                               }
+//                           }
+//                       }
+//                    }
+
+                        },
+                        scrollStateDropDownState = scrollStateDropDownState,
+                        scrollStateDropDownDistrict = scrollStateDropDownDistrict,
+                        trailingEnabled = state.trailingEnabled,
+                        isLoading = state.isLoading,
+                        userLogin = {
+                            viewModal.onUiEvent(ProfileUserUiEvent.UserLogin)
+                        },
+                        isLogin = state.isUserLogin
+
                     )
                 }
-
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
             }
         }
-        Spacer(modifier = Modifier.height(80.dp))
     }
+
 
 }
 

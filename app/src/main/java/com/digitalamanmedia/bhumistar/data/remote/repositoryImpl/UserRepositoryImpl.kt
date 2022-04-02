@@ -1,36 +1,44 @@
 package com.digitalamanmedia.bhumistar.data.remote.repositoryImpl
 
 
-import com.digitalamanmedia.bhumistar.data.remote.api.OTPApi
 import com.digitalamanmedia.bhumistar.data.remote.api.UserApi
 import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.*
-import com.digitalamanmedia.bhumistar.data.remote.dto.responseDto.LogInResponseDto
 
 import com.digitalamanmedia.bhumistar.data.remote.dto.responseDto.NormalResponseDto
-import com.digitalamanmedia.bhumistar.domain.repository.UsersRepository
+import com.digitalamanmedia.bhumistar.data.remote.dto.responseDto.user_response_dto.ImageResponseDto
+import com.digitalamanmedia.bhumistar.data.remote.dto.responseDto.user_response_dto.UserLogInResponseDto
+import com.digitalamanmedia.bhumistar.domain.repository.remote.UsersRepository
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val apiServices: UserApi
-) :UsersRepository{
+    private val userApi: UserApi
+) : UsersRepository {
     override suspend fun createUser(createUserDto: CreateUserDto): NormalResponseDto {
-        return apiServices.createUser(createUserDto)
+        return userApi.createUser(createUserDto)
     }
 
     override suspend fun updateUser(updateUserDto: UpdateUserDto): NormalResponseDto {
-        return apiServices.updateUser(updateUserDto)
+        return userApi.updateUser(updateUserDto)
     }
 
     override suspend fun updatePassword(updatePasswordDto: UpdatePasswordDto): NormalResponseDto {
-        return apiServices.updatePassword(updatePasswordDto)
+        return userApi.updatePassword(updatePasswordDto)
     }
 
-    override suspend fun logInUser(loginUserDto: LoginUserDto): LogInResponseDto {
-        return apiServices.logInUser(loginUserDto)
+    override suspend fun logInUser(loginUserDto: LoginUserDto): UserLogInResponseDto {
+        return userApi.logInUser(loginUserDto)
     }
 
-    override suspend fun checkNumber(checkPhoneNumberDto: CheckPhoneNumberDto): NormalResponseDto {
-        return apiServices.checkNumber(checkPhoneNumberDto)
+    override suspend fun checkEmail(checkEmailDto: CheckEmailDto): NormalResponseDto {
+        return userApi.checkEmail(checkEmailDto)
+    }
+
+    override suspend fun uploadImage(userImageUploadDto: UserImageUploadDto): NormalResponseDto {
+        return userApi.uploadImage(userImageUploadDto)
+    }
+
+    override suspend fun readImage(id: Int): ImageResponseDto {
+        return userApi.readUserImage(id)
     }
 
 

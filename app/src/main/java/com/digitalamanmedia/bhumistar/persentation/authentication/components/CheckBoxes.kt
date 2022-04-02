@@ -12,7 +12,10 @@ import com.digitalamanmedia.bhumistar.core.Commons
 
 
 @Composable
-fun CheckBoxes(list: List<String>,selectedOption:String,onOptionSelected:(String)->Unit) {
+fun CheckBoxes(
+    list: List<String>,
+    selectedOption:String,
+    onOptionSelected:(String)->Unit) {
 
     Row(
         modifier = Modifier
@@ -22,9 +25,11 @@ fun CheckBoxes(list: List<String>,selectedOption:String,onOptionSelected:(String
     ) {
         list.forEach {
             CheckBox(
-                text = "Owner",
-                selected = (it == selectedOption),
-                onClick = {onOptionSelected(it)}
+                text = it,
+                selected = (selectedOption == it),
+                onClick = {
+                    onOptionSelected(it)
+                }
             )
         }
 

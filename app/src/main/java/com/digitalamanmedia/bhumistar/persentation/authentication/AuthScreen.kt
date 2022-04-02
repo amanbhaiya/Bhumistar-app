@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.digitalamanmedia.bhumistar.MainActivity
 import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.UserAuth
 import com.digitalamanmedia.bhumistar.persentation.authentication.vendor_auth.VendorAuth
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -34,7 +33,6 @@ fun tabsWithSwiping(
     tabTitles: List<String>,
     pagerState: PagerState,
     scope: CoroutineScope,
-    onSubmitClick:()->Unit,
 ) {
 
     Column {
@@ -45,8 +43,9 @@ fun tabsWithSwiping(
                 TabRowDefaults.Indicator(
                     Modifier.pagerTabIndicatorOffset(
                         pagerState = pagerState,
-                        tabPositions = tabPositions
-                    )
+                        tabPositions = tabPositions,
+                    ),
+                    color = Color.White
                 )
             },
             modifier = Modifier
@@ -87,8 +86,8 @@ fun tabsWithSwiping(
                 .fillMaxSize()
         ) { tabIndex ->
             when(tabIndex){
-                0 -> VendorAuth(onSubmitClick = onSubmitClick)
-                1 -> UserAuth(onSubmitClick = onSubmitClick)
+                0 -> VendorAuth()
+                1 -> UserAuth()
 
             }
         }

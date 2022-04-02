@@ -7,69 +7,40 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 
 
 @Composable
 fun Dropdown(
-    hint: String,
-    value: String,
-    expanded:Boolean,
-    onValueChanged: (String) -> Unit,
-    onDropDownClick:()->Unit,
     list: List<String>,
     onClickItems:(String)->Unit,
-    scrollState: ScrollState
+    scrollState: ScrollState,
+    height:Dp = 300.dp,
+    fontSize: TextUnit = 17.sp
 ) {
-    val icon = if (expanded){
-        Icons.Filled.KeyboardArrowUp
-    }else{
-        Icons.Filled.KeyboardArrowDown
-    }
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start= 15.dp,top=15.dp, end = 15.dp)
+            .height(height)
+            .verticalScroll(scrollState),
     ) {
-        ProfileTextField(
-            value = value,
-            onValueChanged = onValueChanged,
-            onClearClick = onDropDownClick,
-            icon = icon,
-            hint = hint
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start= 15.dp,top=15.dp, end = 15.dp)
-                .height(
-                    if (expanded) 300.dp else 0.dp
-                )
-                .verticalScroll(scrollState),
-        ) {
-            list.forEach { value->
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onClickItems(value)
-                        },
-                    text = value,
-                    color = MaterialTheme.colors.primaryVariant,
-                    fontSize = 17.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Divider()
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-
+        list.forEach { value->
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onClickItems(value)
+                    },
+                text = value,
+                color = MaterialTheme.colors.primaryVariant,
+                fontSize = fontSize
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
