@@ -1,7 +1,6 @@
 package com.digitalamanmedia.bhumistar.persentation.splash
 
 
-import android.content.Intent
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -17,14 +16,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.digitalamanmedia.bhumistar.R
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.digitalamanmedia.bhumistar.core.Commons
+import com.digitalamanmedia.bhumistar.domain.use_cases.AllUseCases
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.BottomNavScreens
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.Screens
 
 
 @Composable
-fun AppSplashScreen() {
+fun AppSplashScreen(
+    navControllerRoot: NavController,
+    allUseCases: AllUseCases
+) {
 
         val darkTheme = isSystemInDarkTheme()
         val scale= remember{
@@ -42,7 +48,13 @@ fun AppSplashScreen() {
                     }
                 )
             )
-
+            if (allUseCases.onBoardingUseCase.read(Commons.TRUE) == true){
+                navControllerRoot.popBackStack()
+                navControllerRoot.navigate(Screens.MainScreen.route)
+            }else{
+                navControllerRoot.popBackStack()
+                navControllerRoot.navigate(Screens.OnBoarding.route)
+            }
 
         }
         Box(

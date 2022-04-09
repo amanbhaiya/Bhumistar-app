@@ -1,5 +1,7 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_viewmodel
 
+import androidx.navigation.NavController
+
 sealed class UserUiEvent {
     data class EnterNumber(val number:String):UserUiEvent()
     data class EnterOTP(val OTP:String):UserUiEvent()
@@ -13,9 +15,9 @@ sealed class UserUiEvent {
     data class EnterForgotPassword(val forgotPassword:String):UserUiEvent()
     object GetOTP: UserUiEvent()
     object VerifyOTP: UserUiEvent()
-    object RegisterUser: UserUiEvent()
+    data class RegisterUser(val navControllerRoot: NavController,val from:Int): UserUiEvent()
     object SavePassword: UserUiEvent()
-    object LoginUser: UserUiEvent()
+    data class LoginUser(val navControllerRoot: NavController,val from: Int): UserUiEvent()
     object ForgotCheckEmail: UserUiEvent()
     object ForgotTextClick: UserUiEvent()
     object LoginTextClick: UserUiEvent()

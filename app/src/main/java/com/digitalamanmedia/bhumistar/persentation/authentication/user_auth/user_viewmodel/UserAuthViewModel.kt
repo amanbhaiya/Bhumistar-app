@@ -2,12 +2,11 @@ package com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.use
 
 
 import android.app.Application
-import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.digitalamanmedia.bhumistar.persentation.MainActivity
+import androidx.navigation.NavController
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.ALREADY_LOGIN_USER
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.FAILED_OTP
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.FULL_OTP
@@ -22,6 +21,8 @@ import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.LoginUserDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.UserDto.UpdatePasswordDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.otpDto.OtpDto
 import com.digitalamanmedia.bhumistar.domain.use_cases.AllUseCases
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.BottomNavScreens
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -85,12 +86,6 @@ class UserAuthViewModel @Inject constructor (
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private fun startNewActivity(){
-        val intent = Intent(context.applicationContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        context.startActivity(intent)
-    }
 
 
     fun onUiEvent(event: UserUiEvent){
@@ -154,13 +149,17 @@ class UserAuthViewModel @Inject constructor (
                     name = name.value,
                     number = number.value,
                     email = email.value,
-                    password = password.value
+                    password = password.value,
+                    navControllerRoot = event.navControllerRoot,
+                    from = event.from
                 )
             }
             is UserUiEvent.LoginUser->{
                 getResponseLoginUser(
                     email = loginEmail.value,
-                    password = loginPassword.value
+                    password = loginPassword.value,
+                    navControllerRoot = event.navControllerRoot,
+                    from = event.from
                 )
             }
             is UserUiEvent.SavePassword->{
@@ -234,7 +233,7 @@ class UserAuthViewModel @Inject constructor (
             }
         }.launchIn(viewModelScope)
     }
-    private fun getResponseRegisterUser(number:String, name:String,email:String, password:String){
+    private fun getResponseRegisterUser(number:String, name:String,email:String, password:String,navControllerRoot: NavController,from: Int){
         allUseCases.createUserUseCase(
             createUserDto = CreateUserDto(
                 number = number,
@@ -268,7 +267,12 @@ class UserAuthViewModel @Inject constructor (
                             )
                         )
                         allUseCases.verificationAlreadyLoginUseCase.createUserKey(value = ALREADY_LOGIN_USER)
-                        startNewActivity()
+                        if (from != 0){
+                            navControllerRoot.popBackStack()
+                            navControllerRoot.navigate(Screens.DetailScreen.route+"?id=$from")
+                        }else {
+                            navControllerRoot.popBackStack()
+                        }
                     }
                 }
                 is Resource.Error->{
@@ -280,7 +284,7 @@ class UserAuthViewModel @Inject constructor (
             }
         }.launchIn(viewModelScope)
     }
-    private fun getResponseLoginUser(email:String, password: String){
+    private fun getResponseLoginUser(email:String, password: String,navControllerRoot: NavController,from:Int){
         allUseCases.loginUserUseCase(
            loginUserDto = LoginUserDto(
                email = email,
@@ -313,7 +317,12 @@ class UserAuthViewModel @Inject constructor (
                             )
                         )
                         allUseCases.verificationAlreadyLoginUseCase.createUserKey(value = ALREADY_LOGIN_USER)
-                        startNewActivity()
+                        if (from != 0){
+                            navControllerRoot.popBackStack()
+                            navControllerRoot.navigate(Screens.DetailScreen.route+"?id=$from")
+                        }else {
+                            navControllerRoot.popBackStack()
+                        }
                     }
                 }
                 is Resource.Error->{

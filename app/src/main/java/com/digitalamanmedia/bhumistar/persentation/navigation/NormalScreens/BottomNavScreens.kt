@@ -1,31 +1,47 @@
 package com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens
-import androidx.annotation.DrawableRes
-import com.digitalamanmedia.bhumistar.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class BottomNavScreens(val route:String, val title:String, @DrawableRes val icons: Int){
+sealed class BottomNavScreens(
+    val route:String,
+    val title:String,
+    val icons: ImageVector,
+   // val innerScreens:List<String> = emptyList()
+){
 
 
     object Home: BottomNavScreens(
         route="home_route",
         title= "Home",
-        icons= R.drawable.home
+        icons= Icons.Default.Home,
+       // innerScreens = listOf("DetailList_route/?verified={verified}")
     )
     object Search: BottomNavScreens(
         route="search_route",
         title= "Search",
-        icons= R.drawable.search
+        icons= Icons.Default.Search
     )
 
     object Profile: BottomNavScreens(
         route="profile_route",
         title= "Profile",
-        icons= R.drawable.profile
+        icons= Icons.Default.Person
     )
     object Contacts: BottomNavScreens(
         route="contacts_route",
         title= "Contacts",
-        icons= R.drawable.phone
+        icons= Icons.Default.Phone
     )
+//    object DetailList: BottomNavScreens(
+//        route="DetailList_route",
+//        title= "Contacts",
+//        icons= Icons.Default.Phone
+//    )
+
 
 
 }

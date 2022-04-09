@@ -1,6 +1,7 @@
 package com.digitalamanmedia.bhumistar.persentation.screens
 
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
@@ -37,11 +39,14 @@ import com.digitalamanmedia.bhumistar.ui.theme.YellowP
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import java.text.SimpleDateFormat
 
 
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun PropertyDetailScreen(
-    viewModel: PropertyDetailViewModel = hiltViewModel()
+    viewModel: PropertyDetailViewModel = hiltViewModel(),
+    navControllerRoot:NavController
 ) {
     val state = viewModel.state.value
     val refreshState = rememberSwipeRefreshState(isRefreshing = state.isRefreshing)
@@ -355,9 +360,11 @@ fun PropertyDetailScreen(
                                     if (i == 1 && state.onlyTwoComments){
                                         return@forEachIndexed
                                     }
+                                    val dateTime = SimpleDateFormat("dd-MMMM-yyyy, HH:mm")
+                                    val date = dateTime.format(comment.time?.toLong())
                                     CommentItem(
                                         name = comment.username ?: "",
-                                        date = comment.created_at ?: "",
+                                        date = date,
                                         comment = comment.comment ?: "",
                                         rating = comment.rating ?: 0,
                                         userImage = rememberAsyncImagePainter(
@@ -400,20 +407,23 @@ fun PropertyDetailScreen(
                         },
                         isLogin = state.isLogin,
                         onSubmitComment = {
-                            viewModel.onUiEvent(PropertyUiEvent.SubmitReview)
+                            viewModel.onUiEvent(PropertyUiEvent.SubmitReview(navControllerRoot))
                         },
                         btnLoading = state.commentBtnLoading
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
                 item {
-                    OfferPictures(
-                        size = 350.dp
-                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        OfferPictures(
+                            size = 300.dp
+                        )
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
-                }
-                item {
-                    Spacer(modifier = Modifier.height(70.dp))
                 }
             }
         }

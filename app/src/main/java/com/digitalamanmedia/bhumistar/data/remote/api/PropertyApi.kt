@@ -16,11 +16,17 @@ interface PropertyApi {
     ): NormalResponseDto
 
     @GET("v3/all_property_list")
-    suspend fun allPropertyList(): PropertyResponseDto
+    suspend fun allPropertyList(
+        @Query("page") page:Int,
+        @Query("limit") limit:Int,
+        @Query("type") typeWord:String
+    ): PropertyResponseDto
 
     @GET("v3/property_Search")
     suspend fun searchPropertyList(
-        @Query("word") searchWord:String
+        @Query("word") searchWord:String,
+        @Query("page") page:Int,
+        @Query("limit") limit:Int
     ): PropertyResponseDto
 
     @GET("v3/get_one_property")
@@ -36,6 +42,8 @@ interface PropertyApi {
 
     @GET("v3/get_property_by_type")
     suspend fun getPropertyListByType(
-        @Query("word") searchWord:String
+        @Query("type") type:String,
+        @Query("page") page:Int,
+        @Query("limit") limit:Int
     ): PropertyResponseDto
 }

@@ -4,7 +4,7 @@ import com.digitalamanmedia.bhumistar.domain.modal.property_modal.CommentsDataMo
 
 data class CommentsDataDto(
     val comment: String?,
-    val created_at: String?,
+    val time: String?,
     val id: Int?,
     val property_id: Int?,
     val rating: Int?,
@@ -17,7 +17,7 @@ data class CommentsDataDto(
             comment = comment,
             username = username,
             rating = rating,
-            created_at = created_at,
+            time = time,
             user_id = user_id,
             user_image = user_image
         )

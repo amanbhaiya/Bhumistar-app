@@ -6,13 +6,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.digitalamanmedia.bhumistar.R
 import com.digitalamanmedia.bhumistar.core.Commons
 import com.digitalamanmedia.bhumistar.core.components.AddressField
@@ -34,6 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ListPropertyScreen(
     viewModal: ListPropertyViewModal = hiltViewModel(),
+    navControllerRoot:NavController
 ) {
 
     val scope = rememberCoroutineScope()
@@ -81,7 +88,39 @@ fun ListPropertyScreen(
     val scrollStateHorizontal = rememberScrollState()
 
     Scaffold(
-        scaffoldState = scaffoldState
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .clip(
+                        shape = RoundedCornerShape(
+                            bottomStart = 5.dp,
+                            bottomEnd = 5.dp
+                        )
+                    ),
+                backgroundColor = MaterialTheme.colors.primary,
+                title = {
+                    Text(
+                        text = "List Property",
+                        color = Color.White,
+                        fontSize = 22.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                           navControllerRoot.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowBack,
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        }
     ) {
         Column(modifier = Modifier
             .fillMaxSize()

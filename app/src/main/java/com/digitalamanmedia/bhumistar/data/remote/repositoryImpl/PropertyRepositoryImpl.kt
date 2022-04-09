@@ -17,12 +17,12 @@ class PropertyRepositoryImpl @Inject constructor(
         return propertyApi.listProperty(listPropertyDto)
     }
 
-    override suspend fun allPropertyList(): PropertyResponseDto {
-        return propertyApi.allPropertyList()
+    override suspend fun allPropertyList(page:Int,limit:Int,typeWord:String): PropertyResponseDto {
+        return propertyApi.allPropertyList(page,limit,typeWord)
     }
 
-    override suspend fun searchPropertyList(searchWord: String): PropertyResponseDto {
-        return propertyApi.searchPropertyList(searchWord)
+    override suspend fun searchPropertyList(searchWord: String,page: Int,limit: Int): PropertyResponseDto {
+        return propertyApi.searchPropertyList(searchWord,page,limit)
     }
 
     override suspend fun getOneProperty(id: Int): OnePropertyDto {
@@ -33,7 +33,7 @@ class PropertyRepositoryImpl @Inject constructor(
         return propertyApi.postComments(postCommentDto)
     }
 
-    override suspend fun getPropertyListByType(type: String): PropertyResponseDto {
-        return propertyApi.getPropertyListByType(type)
+    override suspend fun getPropertyListByType(type: String,page: Int,limit: Int): PropertyResponseDto {
+        return propertyApi.getPropertyListByType(type,page,limit)
     }
 }

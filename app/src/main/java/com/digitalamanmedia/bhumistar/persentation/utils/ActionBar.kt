@@ -16,7 +16,7 @@ import com.digitalamanmedia.bhumistar.ui.theme.BadgeColor
 
 @Composable
 fun ActionBar(
-    registerVendor:()->Unit
+    listProperty:()->Unit
 ) {
      TopAppBar(
          modifier = Modifier
@@ -51,7 +51,7 @@ fun ActionBar(
                      modifier = Modifier
                          .padding(top = 2.dp, end = 5.dp)
                          .clickable {
-                             registerVendor()
+                             listProperty()
                          },
                      text = "List Property",
                      color = Color.White,

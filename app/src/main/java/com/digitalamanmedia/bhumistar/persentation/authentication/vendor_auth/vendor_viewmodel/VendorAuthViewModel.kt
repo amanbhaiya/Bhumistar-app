@@ -1,12 +1,11 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.vendor_auth.vendor_viewmodel
 
-import android.app.Application
-import android.content.Intent
+
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.digitalamanmedia.bhumistar.persentation.MainActivity
+import androidx.navigation.NavController
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.ALREADY_LOGIN_VENDOR
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.FAILED_OTP
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.FULL_OTP
@@ -20,6 +19,8 @@ import com.digitalamanmedia.bhumistar.data.remote.dto.VendorDto.VendorNumberDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.VendorDto.VendorPasswordUpdateDto
 import com.digitalamanmedia.bhumistar.data.remote.dto.otpDto.OtpDto
 import com.digitalamanmedia.bhumistar.domain.use_cases.AllUseCases
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.BottomNavScreens
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -32,8 +33,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class VendorAuthViewModel @Inject constructor(
-    private val allUseCases: AllUseCases,
-    private val context:Application
+    private val allUseCases: AllUseCases
 ):ViewModel(){
 
     //login
@@ -82,12 +82,6 @@ class VendorAuthViewModel @Inject constructor(
     private val random = Random.nextInt(111111,999999)
     private val otpSend:String = random.toString()
 
-    private fun startNewActivity(){
-        val intent = Intent(context.applicationContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        context.startActivity(intent)
-    }
 
     fun onUiEvent(event: VendorUiEvent){
         when(event){
@@ -102,7 +96,9 @@ class VendorAuthViewModel @Inject constructor(
             is VendorUiEvent.Login->{
                 getResponseLogin(
                     number = loginNumber.value,
-                    password = loginPassword.value
+                    password = loginPassword.value,
+                    navControllerRoot = event.navControllerRoot,
+                    from = event.from
                 )
             }
             is VendorUiEvent.TogglePasswordVisibilityLogin->{
@@ -184,7 +180,9 @@ class VendorAuthViewModel @Inject constructor(
                     name = name.value,
                     email = email.value,
                     number = number.value,
-                    password = password.value
+                    password = password.value,
+                    navControllerRoot = event.navControllerRoot,
+                    from = event.from
                 )
             }
             is VendorUiEvent.RegisterPasswordGetOTP->{
@@ -257,7 +255,9 @@ class VendorAuthViewModel @Inject constructor(
         name:String,
         email:String,
         password: String,
-        number:String
+        number:String,
+        navControllerRoot: NavController,
+        from:Int
     ){
         allUseCases.createVendorUseCase(
             createVendorDto = CreateVendorDto(
@@ -281,7 +281,12 @@ class VendorAuthViewModel @Inject constructor(
                         isRegisterBtnLoading = false
                     )
                     if (result.data.status == 1) {
-                        startNewActivity()
+                        if (from == 1){
+                            navControllerRoot.popBackStack()
+                            navControllerRoot.navigate(Screens.ListProperty.route)
+                        }else {
+                            navControllerRoot.popBackStack()
+                        }
                     }
                 }
                 is Resource.Error->{
@@ -293,7 +298,7 @@ class VendorAuthViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-    private fun getResponseLogin(number:String, password:String){
+    private fun getResponseLogin(number:String, password:String,navControllerRoot: NavController,from: Int){
         allUseCases.loginVendorUseCase(
             loginVendorDto = LoginVendorDto(
                 vendor_password = password,
@@ -328,7 +333,13 @@ class VendorAuthViewModel @Inject constructor(
                         _state.value = state.value.copy(
                             registerBtnEnabled = true
                         )
-                        startNewActivity()
+                        if (from == 1){
+                            navControllerRoot.popBackStack()
+
+                            navControllerRoot.navigate(Screens.ListProperty.route)
+                        }else {
+                            navControllerRoot.popBackStack()
+                        }
                     }
                 }
                 is Resource.Error->{

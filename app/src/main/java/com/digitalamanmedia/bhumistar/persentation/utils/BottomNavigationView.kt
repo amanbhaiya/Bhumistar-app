@@ -2,19 +2,13 @@ package com.digitalamanmedia.bhumistar.persentation.utils
 
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -40,41 +34,54 @@ fun BottomNavigationViewScreen(
             if (index != 3){ //
                     // your implementation
                     BottomNavigationItem(
-                        selected = currentDestination?.route==screens.route,
+                        selected = currentDestination?.route==screens.route,//||screens.innerScreens.contains(currentDestination?.route),
                         onClick = {
+                          Log.d("Tagging",screens.title)
+                            Log.d("Tagging",currentDestination?.route?:"")
                             try {
-                                navController.backQueue.forEach {
-                                    Log.d("taga",it.destination.route.toString()+"\n\n")
-
-                                }
-                                val route = navController.backQueue.find {
-                                    it.destination.route?.contains(screens.route)?:false
-                                } != null
-                                if (route){
-                                    if (currentDestination?.route == screens.route) {
-                                        return@BottomNavigationItem
-                                    }else{
-                                        navController.popBackStack()
-                                        navController.navigate(screens.route){
-                                            launchSingleTop = true
-                                            restoreState=true
-                                        }
-                                    }
-
+                                if (currentDestination?.route == screens.route) {
+                                    return@BottomNavigationItem
                                 }else{
                                     navController.navigate(screens.route){
+                                        popUpTo(navController.graph.findStartDestination().id){
+                                            saveState = true
+                                        }
                                         launchSingleTop = true
                                         restoreState=true
                                     }
-
                                 }
+//                                navController.backQueue.forEach {
+//                                    Log.d("taga",it.destination.route.toString()+"\n\n")
+//
+//                                }
+//                                val route = navController.backQueue.find {
+//                                    it.destination.route?.contains(screens.route)?:false
+//                                } != null
+//                                if (route){
+//                                    if (currentDestination?.route == screens.route) {
+//                                        return@BottomNavigationItem
+//                                    }else{
+//                                        navController.popBackStack()
+//                                        navController.navigate(screens.route){
+//                                            launchSingleTop = true
+//                                            restoreState=true
+//                                        }
+//                                    }
+//
+//                                }else{
+//                                    navController.navigate(screens.route){
+//                                        launchSingleTop = true
+//                                        restoreState=true
+//                                    }
+//
+//                                }
                             } catch (e: IllegalStateException) {
 
                             }
 
                         },
                         icon = { Icon(
-                            painter = painterResource(id = screens.icons),
+                            imageVector = screens.icons,
                             contentDescription = null )
                         },
                         label = { Text(text = screens.title) },

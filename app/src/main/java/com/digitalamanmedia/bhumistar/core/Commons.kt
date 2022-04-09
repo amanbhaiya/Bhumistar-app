@@ -43,8 +43,8 @@ class Commons {
         private const val OFFER_PIC_FOUR = "bhumi4.png"
         private const val OFFER_PIC_FIVE = "bhumi5.png"
         const val LOGO = "Bhumistar.jpg"
-        const val HOME_ROUTE = "home_route"
-        const val SEARCH_ROUTE = "search_route"
+        const val PAGE_SIZE = 20
+        const val LIST = "listing"
         const val ROOT_ROUTE = "root_route"
         const val CHANNEL_ID_1 = "channel1"
         const val CHANNEL_ID_2 = "channel2"
@@ -91,6 +91,9 @@ class Commons {
         const val APARTMENT = "Apartment"
         const val VILLA = "Villa"
         const val FLAT = "Flat"
+        const val MOST_RATED = "Most rated property"
+        const val LAND_PLOT = "Land and Plot"
+        const val APARTMENT_VILLA ="Apartment and Villa"
         fun getFlatsButtons():List<String>{
             return listOf(
                 "1BHK","2BHK","3BHK","4BHK","5BHK","6BHK","7BHK","8BHK","8+BHK"

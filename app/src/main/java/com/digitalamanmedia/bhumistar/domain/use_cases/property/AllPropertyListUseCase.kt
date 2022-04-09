@@ -13,9 +13,9 @@ import javax.inject.Inject
 class AllPropertyListUseCase @Inject constructor(
     private val propertyRepository: PropertyRepository
 ) {
-    operator fun invoke():Flow<Resource<PropertyResponseModal>>{
+    operator fun invoke(typeWord:String,page:Int,limit:Int):Flow<Resource<PropertyResponseModal>>{
         return GetResponse.result {
-            propertyRepository.allPropertyList().toPropertyResponseModal()
+            propertyRepository.allPropertyList(page,limit,typeWord).toPropertyResponseModal()
         }
     }
 }

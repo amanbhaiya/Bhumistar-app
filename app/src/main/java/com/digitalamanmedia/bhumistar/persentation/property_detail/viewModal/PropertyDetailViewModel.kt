@@ -1,8 +1,6 @@
 package com.digitalamanmedia.bhumistar.persentation.property_detail.viewModal
 
 import android.app.Application
-import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +11,8 @@ import com.digitalamanmedia.bhumistar.core.Commons
 import com.digitalamanmedia.bhumistar.core.utils.Resource
 import com.digitalamanmedia.bhumistar.data.remote.dto.PropertyDto.PostCommentDto
 import com.digitalamanmedia.bhumistar.domain.use_cases.AllUseCases
-import com.digitalamanmedia.bhumistar.persentation.authentication.AuthenticationActivity
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.BottomNavScreens
+import com.digitalamanmedia.bhumistar.persentation.navigation.NormalScreens.Screens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -55,49 +54,7 @@ class PropertyDetailViewModel @Inject constructor(
                 _propertyId.value = it
             }
         }
-        viewModelScope.launch {
-            if ( allUseCases.verificationAlreadyLoginUseCase.readUserKey(
-                    Commons.ALREADY_LOGIN_USER
-                ) == Commons.ALREADY_LOGIN_USER){
-                    _state.value = state.value.copy(
-                        isLogin = true
-                    )
-            }else{
-                _state.value = state.value.copy(
-                    isLogin = false
-                )
-            }
-            allUseCases.readUserDataUseCase().collect{
-                _userName.value = it.name?:""
-                _userId.value = it.id?:0
-            }
-
-        }
-
     }
-//    fun sendInt(id:Int){
-//    Log.d("tag",id.toString())
-//        getPropertyDetail(id)
-//        _propertyId.value = id
-//        viewModelScope.launch {
-//            if ( allUseCases.verificationAlreadyLoginUseCase.readUserKey(
-//                    Commons.ALREADY_LOGIN_USER
-//                ) == Commons.ALREADY_LOGIN_USER){
-//                _state.value = state.value.copy(
-//                    isLogin = true
-//                )
-//            }else{
-//                _state.value = state.value.copy(
-//                    isLogin = false
-//                )
-//            }
-//            allUseCases.readUserDataUseCase().collect{
-//                _userName.value = it.name?:""
-//                _userId.value = it.id?:0
-//            }
-//
-//        }
-//    }
 
 
 
@@ -126,10 +83,8 @@ class PropertyDetailViewModel @Inject constructor(
                 if (state.value.isLogin) {
                     getResponsePostComment()
                 }else{
-                    val i = Intent(context.applicationContext,AuthenticationActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                    context.startActivity(i)
+                    event.navControllerRoot.popBackStack()
+                   event.navControllerRoot.navigate(Screens.Authentication.route+"?from=${propertyId.value}")
                 }
             }
         }
@@ -141,7 +96,8 @@ class PropertyDetailViewModel @Inject constructor(
                 property_id = propertyId.value,
                 rating = rating.value,
                 username = userName.value,
-                user_id = userId.value
+                user_id = userId.value,
+                time = System.currentTimeMillis().toString()
             )
         ).onEach { result->
             when(result) {
@@ -184,6 +140,24 @@ class PropertyDetailViewModel @Inject constructor(
                     )
                 }
                 is Resource.Success -> {
+                    viewModelScope.launch {
+                        if ( allUseCases.verificationAlreadyLoginUseCase.readUserKey(
+                                Commons.ALREADY_LOGIN_USER
+                            ) == Commons.ALREADY_LOGIN_USER){
+                            _state.value = state.value.copy(
+                                isLogin = true
+                            )
+                        }else{
+                            _state.value = state.value.copy(
+                                isLogin = false
+                            )
+                        }
+                        allUseCases.readUserDataUseCase().collect{
+                            _userName.value = it.name?:""
+                            _userId.value = it.id?:0
+                        }
+
+                    }
                     if (result.data.status == 1){
                         _state.value = state.value.copy(
                             about_property = result.data.data?.about_property?:"",

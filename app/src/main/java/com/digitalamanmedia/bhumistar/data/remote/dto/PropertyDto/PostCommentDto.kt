@@ -6,4 +6,5 @@ data class PostCommentDto(
     val rating: Int,
     val username: String,
     val user_id:Int,
+    val time:String
 )

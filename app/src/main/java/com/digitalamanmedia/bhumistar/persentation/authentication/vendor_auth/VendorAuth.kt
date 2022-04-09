@@ -14,6 +14,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.digitalamanmedia.bhumistar.core.Commons
 import com.digitalamanmedia.bhumistar.core.utils.SnackBarManager
 import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_viewmodel.UserAuthViewModel
@@ -27,7 +28,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun VendorAuth(
-    viewModel: VendorAuthViewModel = hiltViewModel()
+    viewModel: VendorAuthViewModel = hiltViewModel(),
+    navControllerRoot: NavController,
+    from:Int
 ) {
 
 
@@ -93,7 +96,7 @@ fun VendorAuth(
                     onPasswordClick = { viewModel.onUiEvent(VendorUiEvent.PasswordClick) },
                     isBtnLoading = state.isLoginBtnLoading,
                     onSubmitClick = {
-                        viewModel.onUiEvent(VendorUiEvent.Login)
+                        viewModel.onUiEvent(VendorUiEvent.Login(navControllerRoot,from))
                         message
                     }
                 )
@@ -148,7 +151,7 @@ fun VendorAuth(
                     togglePassword = { viewModel.onUiEvent(VendorUiEvent.ToggleNewPasswordVisibility) },
                     onLoginClick = { viewModel.onUiEvent(VendorUiEvent.LoginTextClickRegister)},
                     onSubmitClick = {
-                        viewModel.onUiEvent(VendorUiEvent.RegisterNewVendor)
+                        viewModel.onUiEvent(VendorUiEvent.RegisterNewVendor(navControllerRoot,from))
                         message
                     },
                     btmEnabled = state.registerBtnEnabled,

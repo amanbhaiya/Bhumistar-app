@@ -10,9 +10,9 @@ import javax.inject.Inject
 class GetPropertyByTypeUseCase @Inject constructor(
     private val propertyRepository: PropertyRepository
 ) {
-    operator fun invoke(type:String):Flow<Resource<PropertyResponseModal>>{
+    operator fun invoke(type:String,page:Int,limit:Int):Flow<Resource<PropertyResponseModal>>{
         return GetResponse.result {
-            propertyRepository.getPropertyListByType(type).toPropertyResponseModal()
+            propertyRepository.getPropertyListByType(type,page,limit).toPropertyResponseModal()
         }
     }
 }

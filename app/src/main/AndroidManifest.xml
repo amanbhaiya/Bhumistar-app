@@ -17,42 +17,18 @@
         android:theme="@style/Theme.Bhumistar"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".persentation.property_uplaod.PropertyUploadActivity"
+            android:name=".persentation.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar" />
-        <activity
-            android:name=".persentation.authentication.AuthenticationActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar"/>
-        <activity
-            android:name=".persentation.onBoarding.onboarding_screen.OnBoardingActivity"
-            android:exported="false"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar" />
-        <activity
-            android:name=".persentation.splash.SplashScreen"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar" >
+            android:theme="@style/Theme.Bhumistar.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".persentation.MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Bhumistar.NoActionBar"/>
         <service
             android:name=".core.utils.NotificationService"
             android:exported="false">

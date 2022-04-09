@@ -1,5 +1,7 @@
 package com.digitalamanmedia.bhumistar.persentation.authentication.vendor_auth.vendor_viewmodel
 
+import androidx.navigation.NavController
+
 
 sealed class VendorUiEvent {
     data class EnterVendorType(val vendorType:String): VendorUiEvent()
@@ -14,7 +16,7 @@ sealed class VendorUiEvent {
     data class EnterForgotNumber(val forgotNumber:String): VendorUiEvent()
     data class EnterForgotPassword(val forgotPassword:String): VendorUiEvent()
 
-    object Login:VendorUiEvent()
+    data class Login(val navControllerRoot: NavController,val from: Int):VendorUiEvent()
     object TogglePasswordVisibilityLogin: VendorUiEvent()
     object SaveNewPassword:VendorUiEvent()
     object ToggleNewPasswordVisibility: VendorUiEvent()
@@ -22,7 +24,7 @@ sealed class VendorUiEvent {
     object ToggleRegisterPasswordVisibility: VendorUiEvent()
     object RegisterPasswordGetOTP:VendorUiEvent()
     object RegisterPasswordVerifyOTP: VendorUiEvent()
-    object RegisterNewVendor: VendorUiEvent()
+    data class RegisterNewVendor(val navControllerRoot: NavController,val from:Int): VendorUiEvent()
     object LoginTextClickPassword:VendorUiEvent()
     object LoginTextClickRegister:VendorUiEvent()
     object RegisterClick:VendorUiEvent()

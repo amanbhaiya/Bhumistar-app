@@ -11,13 +11,13 @@ interface PropertyRepository {
 
     suspend fun listProperty(listPropertyDto: ListPropertyDto):NormalResponseDto
 
-    suspend fun allPropertyList():PropertyResponseDto
+    suspend fun allPropertyList(page:Int,limit:Int,typeWord:String):PropertyResponseDto
 
-    suspend fun searchPropertyList(searchWord:String): PropertyResponseDto
+    suspend fun searchPropertyList(searchWord:String,page: Int,limit: Int): PropertyResponseDto
 
     suspend fun getOneProperty(id:Int): OnePropertyDto
 
     suspend fun postComments(postCommentDto: PostCommentDto):NormalResponseDto
 
-    suspend fun getPropertyListByType(type:String):PropertyResponseDto
+    suspend fun getPropertyListByType(type:String,page: Int,limit: Int):PropertyResponseDto
 }

@@ -2,15 +2,21 @@ package com.digitalamanmedia.bhumistar.core.utils
 
 import android.app.PendingIntent
 import android.content.Intent
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.digitalamanmedia.bhumistar.R
 import com.digitalamanmedia.bhumistar.core.Commons.Companion.CHANNEL_ID_3
 import com.digitalamanmedia.bhumistar.persentation.MainActivity
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class NotificationService: FirebaseMessagingService() {
+    @ExperimentalPagerApi
+    @ExperimentalMaterialApi
+    @ExperimentalPermissionsApi
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         // Create an explicit intent for an Activity in your app

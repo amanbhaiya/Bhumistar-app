@@ -17,6 +17,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.digitalamanmedia.bhumistar.core.utils.SnackBarManager
 import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens.ForgotPasswordScreen
 import com.digitalamanmedia.bhumistar.persentation.authentication.user_auth.user_auth_screens.LoginScreen
@@ -29,7 +30,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UserAuth(
-    viewModel:UserAuthViewModel = hiltViewModel()
+    viewModel:UserAuthViewModel = hiltViewModel(),
+    navControllerRoot:NavController,
+    from:Int
 ) {
     val scope = rememberCoroutineScope()
     val snackBarManager = SnackBarManager(scope)
@@ -90,7 +93,7 @@ fun UserAuth(
                         viewModel.onUiEvent(UserUiEvent.EnterLoginPassword(it))
                     },
                     onSubmitClick = {
-                        viewModel.onUiEvent(UserUiEvent.LoginUser)
+                        viewModel.onUiEvent(UserUiEvent.LoginUser(navControllerRoot,from))
                         message
                     },
                     onLoginPasswordVisibilityClick = {
@@ -168,7 +171,7 @@ fun UserAuth(
                         viewModel.onUiEvent(UserUiEvent.EnterPassword(it))
                     },
                     onSubmitClick = {
-                        viewModel.onUiEvent(UserUiEvent.RegisterUser)
+                        viewModel.onUiEvent(UserUiEvent.RegisterUser(navControllerRoot,from))
                         message
 
                     },

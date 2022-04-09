@@ -12,9 +12,9 @@ import javax.inject.Inject
 class SearchPropertyUseCase @Inject constructor(
     private val propertyRepository: PropertyRepository
 ) {
-    operator fun invoke(searchWord:String):Flow<Resource<PropertyResponseModal>>{
+    operator fun invoke(searchWord:String,page:Int,limit:Int):Flow<Resource<PropertyResponseModal>>{
         return GetResponse.result {
-            propertyRepository.searchPropertyList(searchWord).toPropertyResponseModal()
+            propertyRepository.searchPropertyList(searchWord,page,limit).toPropertyResponseModal()
         }
     }
 }
